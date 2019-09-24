@@ -1,106 +1,101 @@
 package net.zhaoxuyang.common.algorithm.other;
 
-/**
- * LRU算法：使用链表保存缓存数据
- * 1. 新数据插入到链表头部
- * 2. 每当缓存命中（即缓存数据被访问），则将数据移动到链表头部
- * 3. 当链表满的时候，将链表尾部的数据丢弃
- * 
- * 当存在热点数据时，效率很好，但偶发性的、周期性的批量操作会导致LRU命中率急剧下降，缓存污染严重。
- * 实现简单
- * 命中时需要遍历链表，找到命中的数据块索引，然后将数据移到头部。
- */
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-/**
- * 使用一个链表保存缓存数据
- * @author zhaoxuyang
- * @param <K>
- * @param <V>
- */
-public class LruLinkedHashMap<K,V> extends LinkedHashMap<K,V>{
-    private final int MAX_CAPACITY;
-    private static final float DEFAULT_LOAD_FACTOR = 0.75f;
+public class LruLinkedHashMap<K, V> extends LinkedHashMap<K, V> {
+
+    public static void main(String[] args) {
+        LruLinkedHashMap<Character, Integer> lruQueue = new LruLinkedHashMap(10);
+        String data = "abcdefghijklmnfff";
+        for (int i = 0; i < data.length(); i++) {
+            lruQueue.put(data.charAt(i), i);
+        }
+        System.out.printf("k=f,value=%d\n", lruQueue.get('f'));
+        System.out.printf("size()=%d\n", lruQueue.size());
+        System.out.printf("lruQueue=%s\n", lruQueue);
+        /*
+         k=f,value=16
+         size()=10
+         lruQueue={e=4, g=6, h=7, i=8, j=9, k=10, l=11, m=12, n=13, f=16}
+         */
+    }
+
+    private static final boolean ACCESS_ORDER = true;//开启按访问顺序排序的模式
+    private static final float LOAD_FACTOR = 0.75f;
     private final Lock lock = new ReentrantLock();
-    
-    public LruLinkedHashMap(int maxCapacity){
-        super(maxCapacity,DEFAULT_LOAD_FACTOR,true);
-        this.MAX_CAPACITY = maxCapacity;
+    private final int initialCapacity;
+
+    public LruLinkedHashMap(int initialCapacity) {
+        super(initialCapacity, LOAD_FACTOR, ACCESS_ORDER);
+        this.initialCapacity = initialCapacity;
     }
-    
+
     @Override
-    protected boolean removeEldestEntry(java.util.Map.Entry<K,V> eldest){
-        return size() > this.MAX_CAPACITY;
+    protected boolean removeEldestEntry(Entry<K, V> eldest) {
+        return size() > initialCapacity;
     }
-    
+
     @Override
-    public boolean containsKey(Object key){
-        try{
+    public boolean containsKey(Object key) {
+        try {
             lock.lock();
             return super.containsKey(key);
-        }catch(Exception e){
-            System.out.println(e);
-            return false;
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
-    
+
     @Override
-    public V get(Object key){
-        try{
+    public V get(Object key) {
+        try {
             lock.lock();
             return super.get(key);
-        }catch(Exception e){
-            System.out.println(e);
-            return null;
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
-    
+
     @Override
-    public V put(K key, V value){
+    public V put(K key, V value) {
         try {
             lock.lock();
             return super.put(key, value);
-        }catch(Exception e){
-            System.out.println(e);
-            return null;
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
-    
+
     @Override
-    public int size(){
-        try{
+    public int size() {
+        try {
             lock.lock();
             return super.size();
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
+
     @Override
-    public void clear(){
-        try{
+    public void clear() {
+        try {
             lock.lock();
             super.clear();
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
-    public Collection<Map.Entry<K,V>> getAll(){
-        try{
+
+    public Collection<Map.Entry<K, V>> getAll() {
+        try {
             lock.lock();
             return new ArrayList<>(super.entrySet());
-        }finally{
+        } finally {
             lock.unlock();
         }
     }
