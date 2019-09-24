@@ -10,4 +10,15 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    
+    
+    <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.activemq/activemq-client -->
+<dependency>
+    <groupId>org.apache.activemq</groupId>
+    <artifactId>activemq-client</artifactId>
+    <version>5.15.10</version>
+</dependency>
+
+    </dependencies>
 </project>
