@@ -1,4 +1,4 @@
-package net.zhaoxuyang.common.method.rmi.client;
+package net.zhaoxuyang.common.method.rmi.pca.client;
 
 import java.net.MalformedURLException;
 import java.rmi.NotBoundException;
