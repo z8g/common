@@ -1,4 +1,4 @@
-package net.zhaoxuyang.common.current.future;
+package net.zhaoxuyang.common.pattern.future;
 
 import java.util.concurrent.atomic.AtomicInteger;
 

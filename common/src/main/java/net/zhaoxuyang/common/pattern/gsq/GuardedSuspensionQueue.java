@@ -1,4 +1,4 @@
-package net.zhaoxuyang.common.current.gsq;
+package net.zhaoxuyang.common.pattern.gsq;
 
 import java.util.LinkedList;
 

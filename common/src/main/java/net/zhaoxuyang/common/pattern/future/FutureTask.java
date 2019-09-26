@@ -1,4 +1,4 @@
-package net.zhaoxuyang.common.current.future;
+package net.zhaoxuyang.common.pattern.future;
 
 public class FutureTask<T> implements Future {
 
