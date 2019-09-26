@@ -21,7 +21,7 @@ public class EatNoodleThread extends Thread {
     @Override
     public void run() {
         while (true) {
-            eat();
+            this.eat();
         }
     }
 

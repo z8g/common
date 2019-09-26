@@ -1,4 +1,4 @@
-### Single Thread Exception 模式
+### Single Thread Execution 模式
 
 
 #### FlightSecurity 实例

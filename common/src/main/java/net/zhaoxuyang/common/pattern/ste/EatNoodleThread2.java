@@ -20,7 +20,7 @@ public class EatNoodleThread2 extends Thread {
     @Override
     public void run() {
         while (true) {
-            eat();
+            this.eat();
         }
     }
 

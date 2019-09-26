@@ -20,5 +20,5 @@ public class TablewarePair {
     public Tableware getRightTool() {
         return rightTool;
     }
-    
+     
 }

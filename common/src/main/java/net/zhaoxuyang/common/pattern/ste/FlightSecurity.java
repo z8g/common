@@ -20,12 +20,11 @@ public class FlightSecurity {
         this.boardingPass = boardingPass;
         this.idCard = idCard;
         this.count++;
-        check();
+        checkPass();
         
         System.out.println(this);
     }
-
-    private void check() {
+    private void checkPass() {
         if (boardingPass.charAt(0) != idCard.charAt(0)) {
             throw new RuntimeException("Exception:" + toString());
         }
