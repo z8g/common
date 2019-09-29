@@ -21,6 +21,8 @@ import java.util.Arrays;
  *
  * </pre>
  *
+ * 时间复杂度为O(nW)
+ * 缺点：要求w数组中的元素为整数；当W>2^n时，时间复杂度为O(n2^n)
  * @author zhaoxuyang
  */
 public class KnapSack {
@@ -66,7 +68,7 @@ public class KnapSack {
                 }
             }
         }
-
+        
         //构造最优解
         for (int i = row, j = col; i > 0; i--) {
             if (c[i][j] > c[i - 1][j]) {
