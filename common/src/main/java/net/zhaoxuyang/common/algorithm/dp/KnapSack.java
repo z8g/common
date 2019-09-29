@@ -1,4 +1,4 @@
-package net.zhaoxuyang.common.algorithm.problem;
+package net.zhaoxuyang.common.algorithm.dp;
 
 import java.util.Arrays;
 
