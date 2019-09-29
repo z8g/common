@@ -61,7 +61,8 @@ public class KnapSack {
                 if (j < w[i - 1]) {
                     c[i][j] = c[i - 1][j];
                 } else {
-                    c[i][j] = Math.max(c[i - 1][j], c[i - 1][j - w[i - 1]] + v[i - 1]);
+                    int tmp = c[i - 1][j - w[i - 1]] + v[i - 1];
+                    c[i][j] = Math.max(c[i - 1][j], tmp);
                 }
             }
         }
