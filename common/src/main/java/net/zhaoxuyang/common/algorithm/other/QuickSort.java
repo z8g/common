@@ -14,10 +14,10 @@ public class QuickSort {
         System.out.println(Arrays.toString(arr));
     }
 
-    private static void quickSort(int[] arr) {
+    public static void quickSort(int[] arr) {
         quickSort(arr,0,arr.length-1);
     }
-    private static void quickSort(int[] arr, int low, int high) {
+    public static void quickSort(int[] arr, int low, int high) {
         int p;
         if(low < high){
             p = partition(arr,low,high);
