@@ -5,7 +5,7 @@ package net.zhaoxuyang.common.algorithm.problem;
  *
  * @author zhaoxuyang
  */
-public class Lcs {
+public class LastestCommonSequence {
 
     public static void main(String[] args) {
         String x = "ABCBDAB";
