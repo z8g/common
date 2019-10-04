@@ -1,13 +1,23 @@
 package util;
 
 /**
- *
+ * 排序
  * @author zhaoxuyang
  */
 public class Sort {
 
     /**
-     * 快速排序。在排序前先洗牌（舍伍德算法）
+     * 快速排序:在排序前先洗牌（可以参考随机化算法-舍伍德算法）
+     * <pre>
+     * 快速排序的算法改进：
+     * 【切换到插入排序】【三取样切分】【熵最优的排序，三向切分】
+     * <pre>
+     * 三取样切分
+     * (1)使用子数组的一小部分元素的中位数来切分数组，这样能切分得更好，但是需要计算中位数
+     * (2)人们发现将大小设为3并用大小居中的元素切分得效果最好
+     * </pre>
+     * </pre>
+     *
      *
      * @param <T>
      * @param a
@@ -15,9 +25,93 @@ public class Sort {
     public static <T extends Comparable> void quickSort(T[] a) {
         Shuffle.shuffle(a);
         quickSort(a, 0, a.length - 1);
+//        quickSortInsert(a, 0, a.length - 1);
+//        quickSort3way(a, 0, a.length - 1);
     }
 
-    public static <T extends Comparable> void quickSort(T[] a, int low, int high) {
+    /**
+     * 快速排序的改进方法-小数据量转成插入排序
+     * <pre>
+     * (1)对于小数组，快速排序比插入排序慢；
+     * (2)因为递归，快速排序的sort方法会调用自己。
+     * </pre>
+     *
+     * @param <T>
+     * @param a
+     * @param low
+     * @param high
+     */
+    public static <T extends Comparable>
+            void quickSortInsert(T[] a, int low, int high) {
+
+        int m = 65535;
+        if (high <= low + m) {
+            insertSort(a, low, high);
+            return;
+        }
+        int lt = low;
+        int i = low + 1;
+        int gt = high;
+        T v = a[low];
+        while (i <= gt) {
+            int cmp = a[i].compareTo(v);
+            if (cmp < 0) {
+                swap(a, lt++, i++);
+            } else if (cmp > 0) {
+                swap(a, i, gt--);
+            } else {
+                i++;
+            }
+        }
+        quickSort(a, low, lt - 1);
+        quickSort(a, gt + 1, high);
+    }
+
+    /**
+     * 快速排序的改进方法-三向切分（可以参考荷兰国旗问题）
+     * <pre>
+     * 对于存在大量重复元素的数组，三向切分比常规快排高效得多。
+     * </pre>
+     *
+     * @param <T>
+     * @param a
+     * @param low
+     * @param high
+     */
+    public static <T extends Comparable>
+            void quickSort3way(T[] a, int low, int high) {
+
+        if (high <= low) {
+            return;
+        }
+        int lt = low;
+        int i = low + 1;
+        int gt = high;
+        T v = a[low];
+        while (i <= gt) {
+            int cmp = a[i].compareTo(v);
+            if (cmp < 0) {
+                swap(a, lt++, i++);
+            } else if (cmp > 0) {
+                swap(a, i, gt--);
+            } else {
+                i++;
+            }
+        }
+        quickSort(a, low, lt - 1);
+        quickSort(a, gt + 1, high);
+    }
+
+    /**
+     * 常规快速排序的排序方法
+     *
+     * @param <T>
+     * @param a
+     * @param low
+     * @param high
+     */
+    public static <T extends Comparable>
+            void quickSort(T[] a, int low, int high) {
         int p;
         if (low < high) {
             p = partition(a, low, high);
@@ -27,7 +121,7 @@ public class Sort {
     }
 
     /**
-     * 快速排序的划分方法
+     * 常规快速排序的划分方法
      *
      * @param <T>
      * @param a
@@ -35,7 +129,8 @@ public class Sort {
      * @param high
      * @return
      */
-    private static <T extends Comparable> int partition(T[] a, int low, int high) {
+    private static <T extends Comparable>
+            int partition(T[] a, int low, int high) {
         int i = low;
         int j = high;
         T p = a[low];
@@ -172,8 +267,19 @@ public class Sort {
      * @param a
      */
     public static <T extends Comparable> void insertSort(T[] a) {
-        int len = a.length;
-        for (int i = 1; i < len; i++) {
+        insertSort(a, 0, a.length);
+    }
+
+    /**
+     * 插入排序
+     *
+     * @param <T>
+     * @param a
+     * @param low
+     * @param high
+     */
+    public static <T extends Comparable> void insertSort(T[] a, int low, int high) {
+        for (int i = low + 1; i < high; i++) {
             for (int j = i; j > 0 && lt(a[j], a[j - 1]); j--) {
                 swap(a, j, j - 1);
             }
