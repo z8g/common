@@ -75,7 +75,36 @@ public class MaxPriorityQueue<T> implements Iterable<T> {
 
     @Override
     public Iterator<T> iterator() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return new HeapIterator();
+    }
+
+    private class HeapIterator implements Iterator<T> {
+
+        private MaxPriorityQueue<T> copy;
+
+        public HeapIterator() {
+            if (comparator == null) {
+                copy = new MaxPriorityQueue<>(size());
+            } else {
+                copy = new MaxPriorityQueue<>(size(), comparator);
+            }
+            for (int i = 1; i <= size; i++) {
+                copy.insert(pq[i]);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            return !copy.isEmpty();
+        }
+
+        @Override
+        public T next() {
+            if (!hasNext()) {
+                throw new NoSuchElementException();
+            }
+            return copy.deleteMax();
+        }
     }
 
     private void sink(int k) {
