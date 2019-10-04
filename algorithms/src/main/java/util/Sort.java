@@ -1,10 +1,53 @@
 package util;
 
+import java.util.Arrays;
+
 /**
  * 排序
+ *
  * @author zhaoxuyang
  */
 public class Sort {
+
+    public static void main(String[] args) {
+        String[] a = {
+            "1", "2", "3", "a", "a1", "b2", "a0", "_"
+        };
+        //Sort.heapSort(a);
+        //Sort.quickSort3way(a, 0, a.length - 1);
+        System.out.println(Arrays.toString(a));
+    }
+
+    /**
+     * 堆排序
+     *
+     * @param <T>
+     * @param a
+     */
+    public static <T extends Comparable> void heapSort(T[] a) {
+        int n = a.length;
+        for (int k = n / 2; k >= 1; k--) {
+            sink(a, k, n);
+        }
+        while (n > 1) {
+            swap(a, 1 - 1, (n--) - 1);
+            sink(a, 1, n);
+        }
+    }
+
+    private static <T extends Comparable> void sink(T[] pq, int k, int n) {
+        while (2 * k <= n) {
+            int j = 2 * k;
+            if (j < n && less(pq[j - 1], pq[j])) {
+                j++;
+            }
+            if (!less(pq[k - 1], pq[j - 1])) {
+                break;
+            }
+            swap(pq, k - 1, j - 1);
+            k = j;
+        }
+    }
 
     /**
      * 快速排序:在排序前先洗牌（可以参考随机化算法-舍伍德算法）
@@ -135,13 +178,13 @@ public class Sort {
         int j = high;
         T p = a[low];
         while (i < j) {
-            while (i < j && (lt(p, a[j]) || eq(a[j], p))) {
+            while (i < j && (less(p, a[j]) || eq(a[j], p))) {
                 j--;
             }
             if (i < j) {
                 swap(a, i++, j);
             }
-            while (i < j && (lt(a[i], p) || eq(a[i], p))) {
+            while (i < j && (less(a[i], p) || eq(a[i], p))) {
                 i++;
             }
             if (i < j) {
@@ -227,11 +270,11 @@ public class Sort {
             mergeAux[k] = a[k];
         }
         for (int k = low; k <= high; k++) {
-            if (j > middle) {
+            if (i > middle) {
                 a[k] = (T) mergeAux[j++];
             } else if (j > high) {
                 a[k] = (T) mergeAux[i++];
-            } else if (lt(mergeAux[j], mergeAux[i])) {
+            } else if (less(mergeAux[j], mergeAux[i])) {
                 a[k] = (T) mergeAux[j++];
             } else {
                 a[k] = (T) mergeAux[i++];
@@ -253,7 +296,7 @@ public class Sort {
         }
         for (; h >= 1; h /= 3) {
             for (int i = h; i < len; i++) {
-                for (int j = i; j >= h && lt(a[j], a[j - h]); j -= h) {
+                for (int j = i; j >= h && less(a[j], a[j - h]); j -= h) {
                     swap(a, j, j - h);
                 }
             }
@@ -280,7 +323,7 @@ public class Sort {
      */
     public static <T extends Comparable> void insertSort(T[] a, int low, int high) {
         for (int i = low + 1; i < high; i++) {
-            for (int j = i; j > 0 && lt(a[j], a[j - 1]); j--) {
+            for (int j = i; j > 0 && less(a[j], a[j - 1]); j--) {
                 swap(a, j, j - 1);
             }
         }
@@ -297,7 +340,7 @@ public class Sort {
         for (int i = 0; i < len; i++) {
             int min = i;
             for (int j = i + 1; j < len; j++) {
-                if (lt(a[j], a[min])) {
+                if (less(a[j], a[min])) {
                     min = j;
                 }
             }
@@ -327,7 +370,7 @@ public class Sort {
      * @param b
      * @return
      */
-    private static <T extends Comparable> boolean lt(T a, T b) {
+    private static <T extends Comparable> boolean less(T a, T b) {
         return a.compareTo(b) < 0;
     }
 
@@ -352,7 +395,7 @@ public class Sort {
      */
     public static <T extends Comparable> boolean isSorted(T[] array) {
         for (int i = 1; i < array.length; i++) {
-            if (lt(array[i], array[i - 1])) {
+            if (less(array[i], array[i - 1])) {
                 return false;
             }
         }
