@@ -6,7 +6,56 @@ package util;
  */
 public class Sort {
 
-    
+    /**
+     * 快速排序。在排序前先洗牌（舍伍德算法）
+     *
+     * @param <T>
+     * @param a
+     */
+    public static <T extends Comparable> void quickSort(T[] a) {
+        Shuffle.shuffle(a);
+        quickSort(a, 0, a.length - 1);
+    }
+
+    public static <T extends Comparable> void quickSort(T[] a, int low, int high) {
+        int p;
+        if (low < high) {
+            p = partition(a, low, high);
+            quickSort(a, low, p - 1);
+            quickSort(a, p + 1, high);
+        }
+    }
+
+    /**
+     * 快速排序的划分方法
+     *
+     * @param <T>
+     * @param a
+     * @param low
+     * @param high
+     * @return
+     */
+    private static <T extends Comparable> int partition(T[] a, int low, int high) {
+        int i = low;
+        int j = high;
+        T p = a[low];
+        while (i < j) {
+            while (i < j && (lt(p, a[j]) || eq(a[j], p))) {
+                j--;
+            }
+            if (i < j) {
+                swap(a, i++, j);
+            }
+            while (i < j && (lt(a[i], p) || eq(a[i], p))) {
+                i++;
+            }
+            if (i < j) {
+                swap(a, i, j--);
+            }
+        }
+        return j;
+    }
+
     /**
      * 归并排序所需的辅助数组。不将其声明为方法内的局部变量，是为了避免重复创建数组
      */
@@ -14,15 +63,16 @@ public class Sort {
 
     /**
      * 自底向上的归并排序（适用于链表组织的数据）
+     *
      * @param <T>
-     * @param a 
+     * @param a
      */
     public static <T extends Comparable> void mergeSort2(T[] a) {
         int N = a.length;
         mergeAux = new Comparable[a.length];
         for (int i = 1; i < N; i = i + i) {
             for (int low = 0; low < N - i; low += i + i) {
-                mergeMerge(a,low,low+i-1,Math.min(low+i+i-1, N-1));
+                merge(a, low, low + i - 1, Math.min(low + i + i - 1, N - 1));
             }
         }
     }
@@ -54,7 +104,7 @@ public class Sort {
         int middle = low + (high - low) / 2;
         mergeSort(a, low, middle);
         mergeSort(a, middle + 1, high);
-        mergeMerge(a, low, middle, high);
+        merge(a, low, middle, high);
     }
 
     /**
@@ -75,7 +125,7 @@ public class Sort {
      * @param high
      */
     private static <T extends Comparable>
-            void mergeMerge(T[] a, int low, int middle, int high) {
+            void merge(T[] a, int low, int middle, int high) {
         int i = low;
         int j = middle + 1;
         for (int k = low; k <= high; k++) {
