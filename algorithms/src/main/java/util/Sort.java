@@ -6,11 +6,29 @@ package util;
  */
 public class Sort {
 
-    //归并排序所需的辅助数组
+    
+    /**
+     * 归并排序所需的辅助数组。不将其声明为方法内的局部变量，是为了避免重复创建数组
+     */
     private static Comparable[] mergeAux;
 
     /**
-     * 归并排序
+     * 自底向上的归并排序（适用于链表组织的数据）
+     * @param <T>
+     * @param a 
+     */
+    public static <T extends Comparable> void mergeSort2(T[] a) {
+        int N = a.length;
+        mergeAux = new Comparable[a.length];
+        for (int i = 1; i < N; i = i + i) {
+            for (int low = 0; low < N - i; low += i + i) {
+                mergeMerge(a,low,low+i-1,Math.min(low+i+i-1, N-1));
+            }
+        }
+    }
+
+    /**
+     * 自顶向下的归并排序
      *
      * @param <T>
      * @param a
@@ -40,15 +58,16 @@ public class Sort {
     }
 
     /**
-     * 合并
+     * 归并排序的合并方法
      * <pre>
-     * 该方法先将所有元素复制到辅助数组中，再归并回数组a中。 
-     * 在归并时进行了4个条件判断： 
+     * 该方法先将所有元素复制到辅助数组中，再归并回数组a中。
+     * 在归并时进行了4个条件判断：
      * - 左半边用尽（取右半边的元素）
-     * - 右半边用尽（取左半边的元素） 
-     * - 右半边当前元素小于左半边的当前元素（取右半边的元素） 
+     * - 右半边用尽（取左半边的元素）
+     * - 右半边当前元素小于左半边的当前元素（取右半边的元素）
      * - 右半边当前元素大于等于左半边的当前元素（取左半边元素）
      * </pre>
+     *
      * @param <T>
      * @param a
      * @param low
@@ -77,6 +96,7 @@ public class Sort {
 
     /**
      * 希尔排序
+     *
      * @param <T>
      * @param a
      */
@@ -94,10 +114,12 @@ public class Sort {
             }
         }
     }
+
     /**
      * 插入排序
+     *
      * @param <T>
-     * @param a 
+     * @param a
      */
     public static <T extends Comparable> void insertSort(T[] a) {
         int len = a.length;
@@ -107,10 +129,12 @@ public class Sort {
             }
         }
     }
+
     /**
      * 选择排序
+     *
      * @param <T>
-     * @param a 
+     * @param a
      */
     public static <T extends Comparable> void selectSort(T[] a) {
         int len = a.length;
@@ -127,10 +151,11 @@ public class Sort {
 
     /**
      * 根据数组的两个下标交换数组中的元素
+     *
      * @param <T>
      * @param array
      * @param i
-     * @param j 
+     * @param j
      */
     private static <T extends Comparable> void swap(T[] array, int i, int j) {
         T tmp = array[i];
@@ -140,10 +165,11 @@ public class Sort {
 
     /**
      * 判断a是否小于b
+     *
      * @param <T>
      * @param a
      * @param b
-     * @return 
+     * @return
      */
     private static <T extends Comparable> boolean lt(T a, T b) {
         return a.compareTo(b) < 0;
@@ -151,10 +177,11 @@ public class Sort {
 
     /**
      * 判断a是否等于b
+     *
      * @param <T>
      * @param a
      * @param b
-     * @return 
+     * @return
      */
     private static <T extends Comparable> boolean eq(T a, T b) {
         return a.compareTo(b) == 0;
@@ -162,9 +189,10 @@ public class Sort {
 
     /**
      * 判断数组是否排序
+     *
      * @param <T>
      * @param array
-     * @return 
+     * @return
      */
     public static <T extends Comparable> boolean isSorted(T[] array) {
         for (int i = 1; i < array.length; i++) {
@@ -177,8 +205,9 @@ public class Sort {
 
     /**
      * 打印数组
+     *
      * @param <T>
-     * @param array 
+     * @param array
      */
     public static <T extends Comparable> void print(T[] array) {
         for (T t : array) {
