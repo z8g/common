@@ -1,7 +1,7 @@
 package net.zhaoxuyang.common.pattern.memento;
 
 public class User {
-   
+
     private String state1;
     private String state2;
     private String state3;
@@ -29,12 +29,12 @@ public class User {
     public void setState3(String state3) {
         this.state3 = state3;
     }
-    
-    
+
+
     public Memento createMemento(){
         return new Memento(BeanUtils.backupProp(this));
     }
-    
+
     public void restoreMemento(Memento memento){
         BeanUtils.restoreProp(this, memento.getStateMap());
     }
@@ -43,8 +43,4 @@ public class User {
     public String toString() {
         return "User{" + "state1=" + state1 + ", state2=" + state2 + ", state3=" + state3 + '}';
     }
-    
-    
-    
-    
 }

@@ -8,7 +8,7 @@ import java.util.HashMap;
  */
 public class Caretaker {
     private HashMap<String,Memento> memMap = new HashMap<>();
-
+    
     public Memento getMemento(String index) {
         return memMap.get(index);
     }

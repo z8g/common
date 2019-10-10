@@ -1,13 +1,7 @@
 package net.zhaoxuyang.common.pattern.memento;
 
-/**
- *
- * @author Administrator
- */
 public class Main {
     public static void main(String[] args){
-        
-        
         Caretaker caretaker = new Caretaker();
         
         User user = new User();
@@ -25,8 +19,7 @@ public class Main {
         System.out.println(user);
         caretaker.setMemento("002", user.createMemento());
         System.out.println("已添加到备忘录[002]");
-
-        
+ 
         user.restoreMemento(caretaker.getMemento("001"));
         System.err.println("恢复到备忘录[001]");
         System.out.println(user);    
@@ -34,8 +27,5 @@ public class Main {
         user.restoreMemento(caretaker.getMemento("002"));
         System.err.println("恢复到备忘录[002]");
         System.out.println(user);
-        
-        
-        
     }
 }

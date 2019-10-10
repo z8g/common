@@ -16,5 +16,4 @@ public class Memento {
     public void setStateMap(HashMap<String, Object> stateMap) {
         this.stateMap = stateMap;
     }
-    
 }
