@@ -1,0 +1,45 @@
+<?xml version='1.0' encoding='utf-8'?>
+<Server port="8005" shutdown="SHUTDOWN">
+<Listener className="org.apache.catalina.startup.VersionLoggerListener"/>
+<Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on"/>
+<Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener"/>
+<Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener"/>
+<Listener className="org.apache.catalina.core.ThreadLocalLeakPreventionListener"/>
+<GlobalNamingResources>
+    <Resource name="UserDatabase" auth="Container" type="org.apache.catalina.UserDatabase" description="User database that can be updated and saved" factory="org.apache.catalina.users.MemoryUserDatabaseFactory" pathname="conf/tomcat-users.xml"/>
+</GlobalNamingResources>
+
+<Service name="Catalina">
+<Connector port="80" protocol="HTTP/1.1" connectionTimeout="20000" redirectPort="8443" URIEncoding="utf-8"/>
+<Connector port="443" protocol="org.apache.coyote.http11.Http11NioProtocol" maxThreads="150" SSLEnabled="true" scheme="https" secure="true" clientAuth="false" sslEnabledProtocols="SSLv2,SSLv3,TLSv1,TLSv1.1,TLSv1.2,SSLv2Hello" keystoreFile="C:/zhaoxuyang.net.pfx" keystorePass="UN5z83XQ"/>
+<Connector port="8009" protocol="AJP/1.3" redirectPort="8443"/>
+
+
+<Engine name="Catalina" defaultHost="localhost">
+    <Realm className="org.apache.catalina.realm.LockOutRealm">
+        <Realm className="org.apache.catalina.realm.UserDatabaseRealm" resourceName="UserDatabase"/>
+    </Realm>
+
+    <Host name="localhost" appBase="webapps" unpackWARs="true" autoDeploy="true">
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" prefix="localhost_access_log" suffix=".txt" pattern="%h %l %u %t "%r" %s %b"/>
+    </Host>
+
+    <Host name="www.zxy97.com" appBase="webapps" unpackWARs="true" autoDeploy="true">
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" prefix="localhost_access_log." suffix=".txt" pattern="%h %l %u %t "%r" %s %b"/>
+        <Context docBase="C:\WWW\zhaoxuyang.net" path="" reloadable="true" crossContext="true"/>
+
+        <Alias>zxy97.com</Alias>
+        <Alias>www.xiebenzi.com</Alias>
+        <Alias>xiebenzi.com</Alias>
+        <Alias>blog.zhaoxuyang.net</Alias>
+        <Alias>www.zhaoxuyang.net</Alias>
+        <Alias>zhaoxuyang.net</Alias>
+    </Host>
+
+    <Host name="wine.nwsuaf.club" appBase="webapps" unpackWARs="true" autoDeploy="true">
+        <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs" prefix="localhost_access_log." suffix=".txt" pattern="%h %l %u %t "%r" %s %b"/>
+        <Context docBase="C:\WWW\wine.nwsuaf.club" path=""/>
+    </Host>
+</Engine>
+</Service>
+</Server>
