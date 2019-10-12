@@ -31,10 +31,6 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import java.util.concurrent.TimeoutException;
-import ratelimit.annotation.Beta;
-import ratelimit.annotation.CanIgnoreReturnValue;
-import ratelimit.annotation.GwtCompatible;
-import ratelimit.annotation.GwtIncompatible;
 import ratelimit.base.Preconditions;
 
 /**
@@ -46,8 +42,6 @@ import ratelimit.base.Preconditions;
  * @author Anthony Zana
  * @since 10.0
  */
-@Beta
-@GwtCompatible(emulated = true)
 public class Uninterruptibles {
 
     // Implementation Note: As of 3-7-11, the logic for each blocking/timeout
@@ -58,7 +52,6 @@ public class Uninterruptibles {
      *
      * @param latch
      */
-    @GwtIncompatible // concurrency
     public static void awaitUninterruptibly(CountDownLatch latch) {
         boolean interrupted = false;
         try {
@@ -86,8 +79,8 @@ public class Uninterruptibles {
      * @param unit
      * @return 
      */
-    @CanIgnoreReturnValue // TODO(cpovirk): Consider being more strict.
-    @GwtIncompatible // concurrency
+    // TODO(cpovirk): Consider being more strict.
+     // concurrency
     public static boolean awaitUninterruptibly(CountDownLatch latch, long timeout, TimeUnit unit) {
         boolean interrupted = false;
         try {
@@ -113,7 +106,7 @@ public class Uninterruptibles {
     /**
      * Invokes {@code toJoin.}{@link Thread#join() join()} uninterruptibly.
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static void joinUninterruptibly(Thread toJoin) {
         boolean interrupted = false;
         try {
@@ -151,7 +144,7 @@ public class Uninterruptibles {
      * @throws ExecutionException if the computation threw an exception
      * @throws CancellationException if the computation was cancelled
      */
-    @CanIgnoreReturnValue
+   
     public static <V> V getUninterruptibly(Future<V> future) throws ExecutionException {
         boolean interrupted = false;
         try {
@@ -191,8 +184,8 @@ public class Uninterruptibles {
      * @throws CancellationException if the computation was cancelled
      * @throws TimeoutException if the wait timed out
      */
-    @CanIgnoreReturnValue
-    @GwtIncompatible // TODO
+   
+     // TODO
     public static <V> V getUninterruptibly(Future<V> future, long timeout, TimeUnit unit)
             throws ExecutionException, TimeoutException {
         boolean interrupted = false;
@@ -221,7 +214,7 @@ public class Uninterruptibles {
      * {@code unit.}{@link TimeUnit#timedJoin(Thread, long) timedJoin(toJoin, timeout)}
      * uninterruptibly.
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static void joinUninterruptibly(Thread toJoin, long timeout, TimeUnit unit) {
         Preconditions.checkNotNull(toJoin);
         boolean interrupted = false;
@@ -252,7 +245,7 @@ public class Uninterruptibles {
      * @param queue
      * @return 
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static <E> E takeUninterruptibly(BlockingQueue<E> queue) {
         boolean interrupted = false;
         try {
@@ -279,7 +272,7 @@ public class Uninterruptibles {
      * @throws IllegalArgumentException if some property of the specified
      * element prevents it from being added to the given queue
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static <E> void putUninterruptibly(BlockingQueue<E> queue, E element) {
         boolean interrupted = false;
         try {
@@ -305,7 +298,7 @@ public class Uninterruptibles {
      * @param sleepFor
      * @param unit
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
         boolean interrupted = false;
         try {
@@ -338,7 +331,7 @@ public class Uninterruptibles {
      * @return 
      * @since 18.0
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static boolean tryAcquireUninterruptibly(
             Semaphore semaphore, long timeout, TimeUnit unit) {
         return tryAcquireUninterruptibly(semaphore, 1, timeout, unit);
@@ -355,7 +348,7 @@ public class Uninterruptibles {
      * @return 
      * @since 18.0
      */
-    @GwtIncompatible // concurrency
+     // concurrency
     public static boolean tryAcquireUninterruptibly(
             Semaphore semaphore, int permits, long timeout, TimeUnit unit) {
         boolean interrupted = false;

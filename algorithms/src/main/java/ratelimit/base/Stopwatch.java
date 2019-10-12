@@ -10,10 +10,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import ratelimit.annotation.CanIgnoreReturnValue;
-import ratelimit.annotation.GwtCompatible;
-import ratelimit.annotation.GwtIncompatible;
-import ratelimit.annotation.J2ObjCIncompatible;
 import static ratelimit.base.Preconditions.checkNotNull;
 import static ratelimit.base.Preconditions.checkState;
 
@@ -75,7 +71,6 @@ import static ratelimit.base.Preconditions.checkState;
  * @author Kevin Bourrillion
  * @since 10.0
  */
-@GwtCompatible(emulated = true)
 public final class Stopwatch {
 
     private final Ticker ticker;
@@ -145,7 +140,7 @@ public final class Stopwatch {
      * @return this {@code Stopwatch} instance
      * @throws IllegalStateException if the stopwatch is already running.
      */
-    @CanIgnoreReturnValue
+    
     public Stopwatch start() {
         checkState(!isRunning, "This stopwatch is already running.");
         isRunning = true;
@@ -160,7 +155,7 @@ public final class Stopwatch {
      * @return this {@code Stopwatch} instance
      * @throws IllegalStateException if the stopwatch is already stopped.
      */
-    @CanIgnoreReturnValue
+    
     public Stopwatch stop() {
         long tick = ticker.read();
         checkState(isRunning, "This stopwatch is already stopped.");
@@ -175,7 +170,7 @@ public final class Stopwatch {
      *
      * @return this {@code Stopwatch} instance
      */
-    @CanIgnoreReturnValue
+    
     public Stopwatch reset() {
         elapsedNanos = 0;
         isRunning = false;
@@ -215,8 +210,6 @@ public final class Stopwatch {
      *
      * @since 22.0
      */
-    @GwtIncompatible
-    @J2ObjCIncompatible
     public Duration elapsed() {
         return Duration.ofNanos(elapsedNanos());
     }

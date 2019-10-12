@@ -8,10 +8,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import javax.annotation.concurrent.ThreadSafe;
 import ratelimit.SmoothRateLimiter.SmoothBursty;
 import ratelimit.SmoothRateLimiter.SmoothWarmingUp;
-import ratelimit.annotation.Beta;
-import ratelimit.annotation.CanIgnoreReturnValue;
-import ratelimit.annotation.GwtIncompatible;
-import ratelimit.annotation.VisibleForTesting;
 import static ratelimit.base.Preconditions.checkArgument;
 import static ratelimit.base.Preconditions.checkNotNull;
 import ratelimit.base.Stopwatch;
@@ -24,8 +20,6 @@ import ratelimit.base.Stopwatch;
  * @author zhaoxuyang
  */
 @ThreadSafe
-@Beta
-@GwtIncompatible
 public abstract class RateLimiter {
 
     /**
@@ -50,7 +44,6 @@ public abstract class RateLimiter {
      * @param stopwatch
      * @return 
      */
-    @VisibleForTesting
     static RateLimiter create(double permitsPerSecond, SleepingStopwatch stopwatch) {
         double maxBurstSeconds = 1.0;
         RateLimiter rateLimiter = new SmoothBursty(stopwatch, maxBurstSeconds);
@@ -67,7 +60,6 @@ public abstract class RateLimiter {
      * @param stopwatch
      * @return 
      */
-    @VisibleForTesting
     static RateLimiter create(double permitsPerSecond, long warmupPeriod,
             TimeUnit unit, double coldFactor, SleepingStopwatch stopwatch) {
         RateLimiter rateLimiter = new SmoothWarmingUp(stopwatch, warmupPeriod, unit, coldFactor);
@@ -126,7 +118,6 @@ public abstract class RateLimiter {
         }
     }
 
-    @CanIgnoreReturnValue
     public double acquire() {
         return acquire(1);
     }
@@ -137,7 +128,6 @@ public abstract class RateLimiter {
      * @param permits
      * @return 
      */
-    @CanIgnoreReturnValue
     public double acquire(int permits) {
         //预定permits个令牌，并返回等待这些令牌所需的微妙数microsToWait
         long microsToWait = reserve(permits);

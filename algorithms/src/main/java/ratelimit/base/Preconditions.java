@@ -19,8 +19,6 @@ package ratelimit.base;
  */
 
 import javax.annotation.Nullable;
-import ratelimit.annotation.CanIgnoreReturnValue;
-import ratelimit.annotation.GwtCompatible;
 
 /**
  * Static convenience methods that help a method or constructor check whether it was invoked
@@ -110,7 +108,7 @@ import ratelimit.annotation.GwtCompatible;
  * @author Kevin Bourrillion
  * @since 2.0
  */
-@GwtCompatible
+
 public final class Preconditions {
   private Preconditions() {}
 
@@ -785,7 +783,7 @@ public final class Preconditions {
    * @throws NullPointerException if {@code reference} is null
    * @see Verify#verifyNotNull Verify.verifyNotNull()
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T reference) {
     if (reference == null) {
       throw new NullPointerException();
@@ -803,7 +801,7 @@ public final class Preconditions {
    * @throws NullPointerException if {@code reference} is null
    * @see Verify#verifyNotNull Verify.verifyNotNull()
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T reference, @Nullable Object errorMessage) {
     if (reference == null) {
       throw new NullPointerException(String.valueOf(errorMessage));
@@ -826,7 +824,7 @@ public final class Preconditions {
    * @throws NullPointerException if {@code reference} is null
    * @see Verify#verifyNotNull Verify.verifyNotNull()
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T reference, @Nullable String errorMessageTemplate, @Nullable Object... errorMessageArgs) {
     if (reference == null) {
@@ -841,7 +839,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, char p1) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1));
@@ -854,7 +852,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, int p1) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1));
@@ -867,7 +865,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, long p1) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1));
@@ -880,7 +878,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, @Nullable Object p1) {
     if (obj == null) {
@@ -894,7 +892,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, char p1, char p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -907,7 +905,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, char p1, int p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -920,7 +918,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, char p1, long p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -933,7 +931,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, char p1, @Nullable Object p2) {
     if (obj == null) {
@@ -947,7 +945,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, int p1, char p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -960,7 +958,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, int p1, int p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -973,7 +971,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, int p1, long p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -986,7 +984,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, int p1, @Nullable Object p2) {
     if (obj == null) {
@@ -1000,7 +998,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, long p1, char p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -1013,7 +1011,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, long p1, int p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -1026,7 +1024,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(T obj, @Nullable String errorMessageTemplate, long p1, long p2) {
     if (obj == null) {
       throw new NullPointerException(format(errorMessageTemplate, p1, p2));
@@ -1039,7 +1037,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, long p1, @Nullable Object p2) {
     if (obj == null) {
@@ -1053,7 +1051,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, @Nullable Object p1, char p2) {
     if (obj == null) {
@@ -1067,7 +1065,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, @Nullable Object p1, int p2) {
     if (obj == null) {
@@ -1081,7 +1079,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, @Nullable Object p1, long p2) {
     if (obj == null) {
@@ -1095,7 +1093,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj, @Nullable String errorMessageTemplate, @Nullable Object p1, @Nullable Object p2) {
     if (obj == null) {
@@ -1109,7 +1107,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj,
       @Nullable String errorMessageTemplate,
@@ -1127,7 +1125,7 @@ public final class Preconditions {
    *
    * <p>See {@link #checkNotNull(Object, String, Object...)} for details.
    */
-  @CanIgnoreReturnValue
+  
   public static <T> T checkNotNull(
       T obj,
       @Nullable String errorMessageTemplate,
@@ -1177,7 +1175,7 @@ public final class Preconditions {
    * @throws IndexOutOfBoundsException if {@code index} is negative or is not less than {@code size}
    * @throws IllegalArgumentException if {@code size} is negative
    */
-  @CanIgnoreReturnValue
+  
   public static int checkElementIndex(int index, int size) {
     return checkElementIndex(index, size, "index");
   }
@@ -1193,7 +1191,7 @@ public final class Preconditions {
    * @throws IndexOutOfBoundsException if {@code index} is negative or is not less than {@code size}
    * @throws IllegalArgumentException if {@code size} is negative
    */
-  @CanIgnoreReturnValue
+  
   public static int checkElementIndex(int index, int size, @Nullable String desc) {
     // Carefully optimized for execution by hotspot (explanatory comment above)
     if (index < 0 || index >= size) {
@@ -1222,7 +1220,7 @@ public final class Preconditions {
    * @throws IndexOutOfBoundsException if {@code index} is negative or is greater than {@code size}
    * @throws IllegalArgumentException if {@code size} is negative
    */
-  @CanIgnoreReturnValue
+  
   public static int checkPositionIndex(int index, int size) {
     return checkPositionIndex(index, size, "index");
   }
@@ -1238,7 +1236,7 @@ public final class Preconditions {
    * @throws IndexOutOfBoundsException if {@code index} is negative or is greater than {@code size}
    * @throws IllegalArgumentException if {@code size} is negative
    */
-  @CanIgnoreReturnValue
+  
   public static int checkPositionIndex(int index, int size, @Nullable String desc) {
     // Carefully optimized for execution by hotspot (explanatory comment above)
     if (index < 0 || index > size) {

@@ -1,9 +1,4 @@
 package ratelimit.base;
-
-import ratelimit.annotation.Beta;
-import ratelimit.annotation.CanIgnoreReturnValue;
-import ratelimit.annotation.GwtCompatible;
-
 /**
  * A time source; returns a time value representing the number of nanoseconds
  * elapsed since some fixed but arbitrary point in time. Note that most users
@@ -18,8 +13,6 @@ import ratelimit.annotation.GwtCompatible;
  * (<a href="https://github.com/google/guava/wiki/Compatibility">mostly
  * source-compatible</a> since 9.0)
  */
-@Beta
-@GwtCompatible
 public abstract class Ticker {
 
     private static final Ticker SYSTEM_TICKER
@@ -50,7 +43,6 @@ public abstract class Ticker {
      * Returns the number of nanoseconds elapsed since this ticker's fixed point
      * of reference.
      */
-    @CanIgnoreReturnValue // TODO(kak): Consider removing this
     public abstract long read();
 
 }

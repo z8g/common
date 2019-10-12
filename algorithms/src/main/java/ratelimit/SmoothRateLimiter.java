@@ -3,12 +3,8 @@ package ratelimit;
 import static java.lang.Math.min;
 import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import ratelimit.annotation.Beta;
-import ratelimit.annotation.GwtIncompatible;
 
-@GwtIncompatible
 abstract class SmoothRateLimiter extends RateLimiter {
-    @Beta
     public static long saturatedAdd(long a, long b) {
         long naiveSum = a + b;
         if ((a ^ b) < 0 | (a ^ naiveSum) >= 0) {
