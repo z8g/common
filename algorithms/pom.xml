@@ -5,7 +5,7 @@
     <artifactId>algorithms</artifactId>
     <version>1.0</version>
     <packaging>jar</packaging>
-      <parent>
+    <parent>
         <artifactId>common</artifactId>
         <groupId>net.zhaoxuyang</groupId>
         <version>1.0</version>
@@ -16,4 +16,12 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
+        </dependency>
+    </dependencies>
 </project>
