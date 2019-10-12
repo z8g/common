@@ -48,7 +48,7 @@ import ratelimit.base.Preconditions;
  */
 @Beta
 @GwtCompatible(emulated = true)
-public final class Uninterruptibles {
+public class Uninterruptibles {
 
     // Implementation Note: As of 3-7-11, the logic for each blocking/timeout
     // methods is identical, save for method being invoked.
@@ -81,6 +81,10 @@ public final class Uninterruptibles {
      * Invokes
      * {@code latch.}{@link CountDownLatch#await(long, TimeUnit) await(timeout, unit)}
      * uninterruptibly.
+     * @param latch
+     * @param timeout
+     * @param unit
+     * @return 
      */
     @CanIgnoreReturnValue // TODO(cpovirk): Consider being more strict.
     @GwtIncompatible // concurrency
@@ -244,6 +248,9 @@ public final class Uninterruptibles {
     /**
      * Invokes {@code queue.}{@link BlockingQueue#take() take()}
      * uninterruptibly.
+     * @param <E>
+     * @param queue
+     * @return 
      */
     @GwtIncompatible // concurrency
     public static <E> E takeUninterruptibly(BlockingQueue<E> queue) {
@@ -295,6 +302,8 @@ public final class Uninterruptibles {
     /**
      * Invokes {@code unit.}{@link TimeUnit#sleep(long) sleep(sleepFor)}
      * uninterruptibly.
+     * @param sleepFor
+     * @param unit
      */
     @GwtIncompatible // concurrency
     public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
@@ -323,6 +332,10 @@ public final class Uninterruptibles {
      * Invokes {@code semaphore.}{@link Semaphore#tryAcquire(int, long, TimeUnit) tryAcquire(1,
      * timeout, unit)} uninterruptibly.
      *
+     * @param semaphore
+     * @param timeout
+     * @param unit
+     * @return 
      * @since 18.0
      */
     @GwtIncompatible // concurrency
@@ -335,6 +348,11 @@ public final class Uninterruptibles {
      * Invokes {@code semaphore.}{@link Semaphore#tryAcquire(int, long, TimeUnit) tryAcquire(permits,
      * timeout, unit)} uninterruptibly.
      *
+     * @param semaphore
+     * @param permits
+     * @param timeout
+     * @param unit
+     * @return 
      * @since 18.0
      */
     @GwtIncompatible // concurrency
