@@ -3,18 +3,15 @@ package ratelimit;
 import static java.lang.Math.min;
 import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.SECONDS;
+import static ratelimit.RateLimiterUtil.saturatedAdd;
 
+/**
+ * 平滑限制器
+ *
+ * @author zhaoxuyang
+ */
 abstract class SmoothRateLimiter extends RateLimiter {
-    public static long saturatedAdd(long a, long b) {
-        long naiveSum = a + b;
-        if ((a ^ b) < 0 | (a ^ naiveSum) >= 0) {
-            // If a and b have different signs or a has the same sign as the result then there was no
-            // overflow, return.
-            return naiveSum;
-        }
-        // we did over/under flow, if the sign is negative we should return MAX otherwise MIN
-        return Long.MAX_VALUE + ((naiveSum >>> (Long.SIZE - 1)) ^ 1);
-    }
+
 
     /**
      * 当前存储的令牌数
@@ -87,6 +84,9 @@ abstract class SmoothRateLimiter extends RateLimiter {
         }
     }
 
+    /**
+     * 平滑升温
+     */
     static class SmoothWarmingUp extends SmoothRateLimiter {
 
         private final long warmupPeriodMicros;
@@ -144,6 +144,9 @@ abstract class SmoothRateLimiter extends RateLimiter {
         }
     }
 
+    /**
+     * 平滑突发
+     */
     static class SmoothBursty extends SmoothRateLimiter {
 
         final double maxBurstSeconds;//在RateLimiter未使用时，最多存储几秒的令牌

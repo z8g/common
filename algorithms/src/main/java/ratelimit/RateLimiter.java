@@ -2,7 +2,7 @@ package ratelimit;
 
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
-import ratelimit.base.Stopwatch;
+import static ratelimit.RateLimiterUtil.checkArgument;
 
 /**
  * Guava有两种限流模式， 一种为稳定模式(SmoothBursty:令牌生成速度恒定)，
@@ -12,69 +12,20 @@ import ratelimit.base.Stopwatch;
  */
 public abstract class RateLimiter {
 
-    public static <T> T checkNotNull(T reference) {
-        if (reference == null) {
-            throw new NullPointerException();
-        }
-        return reference;
-    }
-
-    static String format(String theTemplate, Object... args) {
-        String template = String.valueOf(theTemplate);
-        StringBuilder builder = new StringBuilder(template.length() + 16 * args.length);
-        int templateStart = 0;
-        int i = 0;
-        while (i < args.length) {
-            int placeholderStart = template.indexOf("%s", templateStart);
-            if (placeholderStart == -1) {
-                break;
-            }
-            builder.append(template, templateStart, placeholderStart);
-            builder.append(args[i++]);
-            templateStart = placeholderStart + 2;
-        }
-        builder.append(template, templateStart, template.length());
-
-        // if we run out of placeholders, append the extra args in square braces
-        if (i < args.length) {
-            builder.append(" [");
-            builder.append(args[i++]);
-            while (i < args.length) {
-                builder.append(", ");
-                builder.append(args[i++]);
-            }
-            builder.append(']');
-        }
-
-        return builder.toString();
-    }
-
-    public static void checkArgument(boolean b, String errorMessageTemplate, long p1) {
-        if (!b) {
-            throw new IllegalArgumentException(format(errorMessageTemplate, p1));
-        }
-    }
-
-    public static void checkArgument(boolean expression, Object errorMessage) {
-        if (!expression) {
-            throw new IllegalArgumentException(String.valueOf(errorMessage));
-        }
-    }
-
     /**
      * 创建一个ReteLimiter实例
      *
-     * @param permitsPerSecond 令牌数，理解为QPS
+     * @param qps 令牌数，理解为QPS
      * @return 一个"平滑突发"类型的SmoothBursty的实例
      */
-    public static RateLimiter create(double permitsPerSecond) {
-        return create(permitsPerSecond, SleepingStopwatch.createFromSystemTimer());
+    public static RateLimiter create(double qps) {
+        return create(qps, SleepingStopwatch.createFromSystemTimer());
     }
 
-    public static RateLimiter create(double permitsPerSecond, long warmupPeriod, TimeUnit unit) {
-        checkArgument(warmupPeriod >= 0, "预热指数不能为负: %s", warmupPeriod);
+    public static RateLimiter create(double qps, long warmupPeriod, TimeUnit unit) {
+        checkArgument(warmupPeriod >= 0, String.format("预热指数不能为负: %s", warmupPeriod));
         double coldFactor = 3.0;
-        return create(permitsPerSecond, warmupPeriod, unit, coldFactor,
+        return create(qps, warmupPeriod, unit, coldFactor,
                 SleepingStopwatch.createFromSystemTimer());
     }
 
@@ -85,10 +36,11 @@ public abstract class RateLimiter {
      * @param stopwatch
      * @return
      */
-    static RateLimiter create(double permitsPerSecond, SleepingStopwatch stopwatch) {
+    static RateLimiter create(double qps, SleepingStopwatch stopwatch) {
         double maxBurstSeconds = 1.0;
-        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothBursty(stopwatch, maxBurstSeconds);
-        rateLimiter.setRate(permitsPerSecond);
+        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothBursty(
+                stopwatch, maxBurstSeconds);
+        rateLimiter.setRate(qps);
         return rateLimiter;
     }
 
@@ -104,44 +56,27 @@ public abstract class RateLimiter {
      */
     static RateLimiter create(double permitsPerSecond, long warmupPeriod,
             TimeUnit unit, double coldFactor, SleepingStopwatch stopwatch) {
-        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothWarmingUp(stopwatch, warmupPeriod, unit, coldFactor);
+        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothWarmingUp(
+                stopwatch, warmupPeriod, unit, coldFactor);
         rateLimiter.setRate(permitsPerSecond);
         return rateLimiter;
     }
 
     private static void checkPermits(int permits) {
-        checkArgument(permits > 0, "令牌数 (%s) 必须为正", permits);
+        checkArgument(permits > 0, String.format("令牌数(%s)必须为正", permits));
     }
 
-    public static void sleepUninterruptibly(long sleepFor, TimeUnit unit) {
-        boolean interrupted = false;
-        try {
-            long remainingNanos = unit.toNanos(sleepFor);
-            long end = System.nanoTime() + remainingNanos;
-            while (true) {
-                try {
-                    TimeUnit.NANOSECONDS.sleep(remainingNanos);
-                    return;
-                } catch (InterruptedException e) {
-                    interrupted = true;
-                    remainingNanos = end - System.nanoTime();
-                }
-            }
-        } finally {
-            if (interrupted) {
-                Thread.currentThread().interrupt();
-            }
-        }
-    }
-
-    private final SleepingStopwatch stopwatch;
-    private volatile Object mutexDoNotUseDirectly;
+    private final SleepingStopwatch stopwatch;//秒表
+    private volatile Object mutexDoNotUseDirectly;//互斥量不直接使用
 
     RateLimiter(SleepingStopwatch stopwatch) {
-        this.stopwatch = checkNotNull(stopwatch);
+        if (stopwatch == null) {
+            throw new NullPointerException();
+        }
+        this.stopwatch = stopwatch;
     }
 
-    abstract void doSetRate(double permitsPerSecond, long nowMicros);
+    abstract void doSetRate(double qps, long nowMicros);
 
     abstract double doGetRate();
 
@@ -164,15 +99,22 @@ public abstract class RateLimiter {
     }
 
     /**
-     * 通过这个接口设置令牌通每秒生成令牌的数量，内部时间通过调用SmoothRateLimiter的doSetRate来实现
+     * 通过这个接口设置令牌通每秒生成令牌的数量.
+     * <ul>
+     * <li> qps==qps 等价于 !Double.isNaN(qps) </li>
+     * <li> 内部时间通过调用 {@link SmoothRateLimiter#doSetRate } 来实现</li>
+     * </ul>
+     * <pre>
+     *
+     *
+     * </pre>
      *
      * @param permitsPerSecond
      */
-    void setRate(double permitsPerSecond) {
-        checkArgument(permitsPerSecond > 0.0 && !Double.isNaN(permitsPerSecond),
-                "rate must be positive");
+    void setRate(double qps) {
+        checkArgument(qps > 0.0 && (qps == qps), "QPS必须为正");
         synchronized (mutex()) {
-            doSetRate(permitsPerSecond, stopwatch.readMicros());
+            doSetRate(qps, stopwatch.readMicros());
         }
     }
 
@@ -257,7 +199,7 @@ public abstract class RateLimiter {
 
     @Override
     public String toString() {
-        return String.format(Locale.ROOT, "RateLimiter[stableRate=%3.1fqps]", getRate());
+        return String.format(Locale.ROOT, "[qps = %.3f]", getRate());
     }
 
     abstract static class SleepingStopwatch {
@@ -274,7 +216,7 @@ public abstract class RateLimiter {
                 @Override
                 protected void sleepMicrosUninterruptibly(long micros) {
                     if (micros > 0) {
-                        sleepUninterruptibly(micros, TimeUnit.MICROSECONDS);
+                        RateLimiterUtil.sleepUninterruptibly(micros, TimeUnit.MICROSECONDS);
                     }
                 }
             };
