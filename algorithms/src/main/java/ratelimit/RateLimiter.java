@@ -5,7 +5,6 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import static java.util.concurrent.TimeUnit.MICROSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import javax.annotation.concurrent.ThreadSafe;
 import ratelimit.SmoothRateLimiter.SmoothBursty;
 import ratelimit.SmoothRateLimiter.SmoothWarmingUp;
 import static ratelimit.base.Preconditions.checkArgument;
@@ -19,7 +18,6 @@ import ratelimit.base.Stopwatch;
  * 主要区别在等待时间的计算上
  * @author zhaoxuyang
  */
-@ThreadSafe
 public abstract class RateLimiter {
 
     /**
