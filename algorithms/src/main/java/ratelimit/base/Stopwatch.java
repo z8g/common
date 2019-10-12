@@ -10,8 +10,6 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.MINUTES;
 import static java.util.concurrent.TimeUnit.NANOSECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
-import static ratelimit.base.Preconditions.checkNotNull;
-import static ratelimit.base.Preconditions.checkState;
 
 /**
  * An object that measures elapsed time in nanoseconds. It is useful to measure
@@ -71,17 +69,12 @@ import static ratelimit.base.Preconditions.checkState;
  * @author Kevin Bourrillion
  * @since 10.0
  */
-public final class Stopwatch {
-
-    private final Ticker ticker;
-    private boolean isRunning;
-    private long elapsedNanos;
-    private long startTick;
-
+public class Stopwatch {
     /**
      * Creates (but does not start) a new stopwatch using
      * {@link System#nanoTime} as its time source.
      *
+     * @return 
      * @since 15.0
      */
     public static Stopwatch createUnstarted() {
@@ -92,6 +85,8 @@ public final class Stopwatch {
      * Creates (but does not start) a new stopwatch, using the specified time
      * source.
      *
+     * @param ticker
+     * @return 
      * @since 15.0
      */
     public static Stopwatch createUnstarted(Ticker ticker) {
@@ -102,6 +97,7 @@ public final class Stopwatch {
      * Creates (and starts) a new stopwatch using {@link System#nanoTime} as its
      * time source.
      *
+     * @return 
      * @since 15.0
      */
     public static Stopwatch createStarted() {
@@ -111,11 +107,72 @@ public final class Stopwatch {
     /**
      * Creates (and starts) a new stopwatch, using the specified time source.
      *
+     * @param ticker
+     * @return 
      * @since 15.0
      */
     public static Stopwatch createStarted(Ticker ticker) {
         return new Stopwatch(ticker).start();
     }
+    public static <T> T checkNotNull(T reference, Object errorMessage) {
+        if (reference == null) {
+            throw new NullPointerException(String.valueOf(errorMessage));
+        }
+        return reference;
+    }
+    public static void checkState(boolean expression, Object errorMessage) {
+        if (!expression) {
+            throw new IllegalStateException(String.valueOf(errorMessage));
+        }
+    }
+    private static TimeUnit chooseUnit(long nanos) {
+        if (DAYS.convert(nanos, NANOSECONDS) > 0) {
+            return DAYS;
+        }
+        if (HOURS.convert(nanos, NANOSECONDS) > 0) {
+            return HOURS;
+        }
+        if (MINUTES.convert(nanos, NANOSECONDS) > 0) {
+            return MINUTES;
+        }
+        if (SECONDS.convert(nanos, NANOSECONDS) > 0) {
+            return SECONDS;
+        }
+        if (MILLISECONDS.convert(nanos, NANOSECONDS) > 0) {
+            return MILLISECONDS;
+        }
+        if (MICROSECONDS.convert(nanos, NANOSECONDS) > 0) {
+            return MICROSECONDS;
+        }
+        return NANOSECONDS;
+    }
+    private static String abbreviate(TimeUnit unit) {
+        switch (unit) {
+            case NANOSECONDS:
+                return "ns";
+            case MICROSECONDS:
+                return "\u03bcs"; // μs
+            case MILLISECONDS:
+                return "ms";
+            case SECONDS:
+                return "s";
+            case MINUTES:
+                return "min";
+            case HOURS:
+                return "h";
+            case DAYS:
+                return "d";
+            default:
+                throw new AssertionError();
+        }
+    }
+    public static String formatCompact4Digits(double value) {
+        return String.format(Locale.ROOT, "%.4g", value);
+    }
+    private final Ticker ticker;
+    private boolean isRunning;
+    private long elapsedNanos;
+    private long startTick;
 
     Stopwatch() {
         this.ticker = Ticker.systemTicker();
@@ -140,7 +197,6 @@ public final class Stopwatch {
      * @return this {@code Stopwatch} instance
      * @throws IllegalStateException if the stopwatch is already running.
      */
-    
     public Stopwatch start() {
         checkState(!isRunning, "This stopwatch is already running.");
         isRunning = true;
@@ -155,7 +211,6 @@ public final class Stopwatch {
      * @return this {@code Stopwatch} instance
      * @throws IllegalStateException if the stopwatch is already stopped.
      */
-    
     public Stopwatch stop() {
         long tick = ticker.read();
         checkState(isRunning, "This stopwatch is already stopped.");
@@ -164,13 +219,14 @@ public final class Stopwatch {
         return this;
     }
 
+
     /**
      * Sets the elapsed time for this stopwatch to zero, and places it in a
      * stopped state.
      *
      * @return this {@code Stopwatch} instance
      */
-    
+
     public Stopwatch reset() {
         elapsedNanos = 0;
         isRunning = false;
@@ -196,6 +252,8 @@ public final class Stopwatch {
      * {@link #elapsed()} instead, which returns a strongly-typed
      * {@link Duration} instance.
      *
+     * @param desiredUnit
+     * @return 
      * @since 14.0 (since 10.0 as {@code elapsedTime()})
      */
     public long elapsed(TimeUnit desiredUnit) {
@@ -208,6 +266,7 @@ public final class Stopwatch {
      * #elapsed(TimeUnit)}, this method does not lose any precision due to
      * rounding.
      *
+     * @return 
      * @since 22.0
      */
     public Duration elapsed() {
@@ -216,6 +275,7 @@ public final class Stopwatch {
 
     /**
      * Returns a string representation of the current elapsed time.
+     * @return 
      */
     @Override
     public String toString() {
@@ -228,50 +288,4 @@ public final class Stopwatch {
         return formatCompact4Digits(value) + " " + abbreviate(unit);
     }
 
-    private static TimeUnit chooseUnit(long nanos) {
-        if (DAYS.convert(nanos, NANOSECONDS) > 0) {
-            return DAYS;
-        }
-        if (HOURS.convert(nanos, NANOSECONDS) > 0) {
-            return HOURS;
-        }
-        if (MINUTES.convert(nanos, NANOSECONDS) > 0) {
-            return MINUTES;
-        }
-        if (SECONDS.convert(nanos, NANOSECONDS) > 0) {
-            return SECONDS;
-        }
-        if (MILLISECONDS.convert(nanos, NANOSECONDS) > 0) {
-            return MILLISECONDS;
-        }
-        if (MICROSECONDS.convert(nanos, NANOSECONDS) > 0) {
-            return MICROSECONDS;
-        }
-        return NANOSECONDS;
-    }
-
-    private static String abbreviate(TimeUnit unit) {
-        switch (unit) {
-            case NANOSECONDS:
-                return "ns";
-            case MICROSECONDS:
-                return "\u03bcs"; // μs
-            case MILLISECONDS:
-                return "ms";
-            case SECONDS:
-                return "s";
-            case MINUTES:
-                return "min";
-            case HOURS:
-                return "h";
-            case DAYS:
-                return "d";
-            default:
-                throw new AssertionError();
-        }
-    }
-
-    static String formatCompact4Digits(double value) {
-        return String.format(Locale.ROOT, "%.4g", value);
-    }
 }

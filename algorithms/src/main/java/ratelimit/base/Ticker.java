@@ -1,4 +1,5 @@
 package ratelimit.base;
+
 /**
  * A time source; returns a time value representing the number of nanoseconds
  * elapsed since some fixed but arbitrary point in time. Note that most users
@@ -15,8 +16,7 @@ package ratelimit.base;
  */
 public abstract class Ticker {
 
-    private static final Ticker SYSTEM_TICKER
-            = new Ticker() {
+    private static final Ticker SYSTEM_TICKER = new Ticker() {
         @Override
         public long read() {
             return System.nanoTime();
@@ -42,6 +42,7 @@ public abstract class Ticker {
     /**
      * Returns the number of nanoseconds elapsed since this ticker's fixed point
      * of reference.
+     * @return 
      */
     public abstract long read();
 
