@@ -15,31 +15,48 @@ public abstract class RateLimiter {
     /**
      * 创建一个ReteLimiter实例
      *
-     * @param qps 令牌数，理解为QPS
+     * @param qps 每秒内处理的请求数
      * @return 一个"平滑突发"类型的SmoothBursty的实例
      */
     public static RateLimiter create(double qps) {
-        return create(qps, SleepingStopwatch.createFromSystemTimer());
-    }
-
-    public static RateLimiter create(double qps, long warmupPeriod, TimeUnit unit) {
-        checkArgument(warmupPeriod >= 0, String.format("预热指数不能为负: %s", warmupPeriod));
-        double coldFactor = 3.0;
-        return create(qps, warmupPeriod, unit, coldFactor,
-                SleepingStopwatch.createFromSystemTimer());
+        return create(qps, SleepingStopwatch.create(), 1.0);
     }
 
     /**
-     * 令牌生成速度恒定SmoothBursty
+     * 创建一个ReteLimiter实例
      *
-     * @param permitsPerSecond
-     * @param stopwatch
+     * @param qps 每秒内处理的请求数
+     * @param maxBurstSeconds 在RateLimiter未使用时，最多存储几秒的令牌
+     * @return 一个"平滑突发"类型的SmoothBursty的实例
+     */
+    public static RateLimiter create(double qps, double maxBurstSeconds) {
+        return create(qps, SleepingStopwatch.create(), maxBurstSeconds);
+    }
+
+    /**
+     *
+     * @param qps
+     * @param warmup
+     * @param unit
      * @return
      */
-    static RateLimiter create(double qps, SleepingStopwatch stopwatch) {
-        double maxBurstSeconds = 1.0;
-        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothBursty(
-                stopwatch, maxBurstSeconds);
+    public static RateLimiter create(double qps, long warmup, TimeUnit unit) {
+        checkArgument(warmup >= 0, String.format("预热指数不能为负: %s", warmup));
+        double coldFactor = 2;
+        return create(qps, warmup, unit, coldFactor, SleepingStopwatch.create());
+    }
+
+    /**
+     * 创建一个令牌生成速度恒定的SmoothBursty
+     *
+     * @param qps
+     * @param stopwatch
+     * @param maxBurstSeconds 在RateLimiter未使用时，最多存储几秒的令牌
+     * @return
+     */
+    static RateLimiter create(
+            double qps, SleepingStopwatch stopwatch, double maxBurstSeconds) {
+        RateLimiter rateLimiter = new SmoothBursty(stopwatch, maxBurstSeconds);
         rateLimiter.setRate(qps);
         return rateLimiter;
     }
@@ -56,8 +73,7 @@ public abstract class RateLimiter {
      */
     static RateLimiter create(double permitsPerSecond, long warmupPeriod,
             TimeUnit unit, double coldFactor, SleepingStopwatch stopwatch) {
-        RateLimiter rateLimiter = new SmoothRateLimiter.SmoothWarmingUp(
-                stopwatch, warmupPeriod, unit, coldFactor);
+        RateLimiter rateLimiter = new SmoothWarmingUp(stopwatch, warmupPeriod, unit, coldFactor);
         rateLimiter.setRate(permitsPerSecond);
         return rateLimiter;
     }
@@ -104,21 +120,16 @@ public abstract class RateLimiter {
      * <li> qps==qps 等价于 !Double.isNaN(qps) </li>
      * <li> 内部时间通过调用 {@link SmoothRateLimiter#doSetRate } 来实现</li>
      * </ul>
-     * <pre>
-     *
-     *
-     * </pre>
-     *
-     * @param permitsPerSecond
+     * @param qps
      */
-    void setRate(double qps) {
+    public void setRate(double qps) {
         checkArgument(qps > 0.0 && (qps == qps), "QPS必须为正");
         synchronized (mutex()) {
             doSetRate(qps, stopwatch.readMicros());
         }
     }
 
-    double getRate() {
+    public double getRate() {
         synchronized (mutex()) {
             return doGetRate();
         }
@@ -139,7 +150,7 @@ public abstract class RateLimiter {
         //预定permits个令牌，并返回等待这些令牌所需的微妙数microsToWait
         long microsToWait = reserve(permits);
         //等待microsToWait微妙
-        stopwatch.sleepMicrosUninterruptibly(microsToWait);
+        stopwatch.sleepUninterruptibly(microsToWait);
         //返回消耗的时间
         double result = 1.0 * microsToWait / TimeUnit.SECONDS.toMicros(1L);
         return result;
@@ -153,18 +164,17 @@ public abstract class RateLimiter {
         }
     }
 
-    boolean tryAcquire() {
+    public boolean tryAcquire() {
         return tryAcquire(1, 0, TimeUnit.MICROSECONDS);
     }
 
-    boolean tryAcquire(int permits) {
+    public boolean tryAcquire(int permits) {
         return tryAcquire(permits, 0, TimeUnit.MICROSECONDS);
     }
 
-    boolean tryAcquire(long timeout, TimeUnit unit) {
+    public boolean tryAcquire(long timeout, TimeUnit unit) {
         return tryAcquire(1, timeout, unit);
     }
-
     /**
      *
      * @param permits 令牌数（QPS）
@@ -184,7 +194,7 @@ public abstract class RateLimiter {
                 microsToWait = reserveAndGetWaitLength(permits, nowMicros);
             }
         }
-        stopwatch.sleepMicrosUninterruptibly(microsToWait);
+        stopwatch.sleepUninterruptibly(microsToWait);
         return true;
     }
 
@@ -200,35 +210,6 @@ public abstract class RateLimiter {
     @Override
     public String toString() {
         return String.format(Locale.ROOT, "[qps = %.3f]", getRate());
-    }
-
-    abstract static class SleepingStopwatch {
-
-        public static SleepingStopwatch createFromSystemTimer() {
-            return new SleepingStopwatch() {
-                final Stopwatch stopwatch = Stopwatch.createStarted();
-
-                @Override
-                protected long readMicros() {
-                    return stopwatch.elapsed(TimeUnit.MICROSECONDS);
-                }
-
-                @Override
-                protected void sleepMicrosUninterruptibly(long micros) {
-                    if (micros > 0) {
-                        RateLimiterUtil.sleepUninterruptibly(micros, TimeUnit.MICROSECONDS);
-                    }
-                }
-            };
-        }
-
-        protected SleepingStopwatch() {
-        }
-
-        protected abstract long readMicros();
-
-        protected abstract void sleepMicrosUninterruptibly(long micros);
-
     }
 
 }

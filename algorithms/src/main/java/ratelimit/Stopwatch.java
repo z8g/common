@@ -25,7 +25,7 @@ public class Stopwatch {
 
     private boolean isRunning;
     private long elapsedNanos;
-    private long startTick;
+    private long startNanos;
 
     public boolean isRunning() {
         return isRunning;
@@ -34,7 +34,7 @@ public class Stopwatch {
     public Stopwatch start() {
         checkState(!isRunning, "Stopwatch已经运行了");
         isRunning = true;
-        startTick = System.nanoTime();
+        startNanos = System.nanoTime();
         return this;
     }
 
@@ -42,7 +42,7 @@ public class Stopwatch {
         long tick = System.nanoTime();
         checkState(isRunning, "Stopwatch已经停止了");
         isRunning = false;
-        elapsedNanos += (tick - startTick);
+        elapsedNanos += (tick - startNanos);
         return this;
     }
 
@@ -57,7 +57,7 @@ public class Stopwatch {
      */
     private long elapsedNanos() {
         return isRunning
-                ? System.nanoTime() - startTick + elapsedNanos
+                ? System.nanoTime() - startNanos + elapsedNanos
                 : elapsedNanos;
     }
 
