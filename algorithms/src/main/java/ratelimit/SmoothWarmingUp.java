@@ -20,7 +20,8 @@ public class SmoothWarmingUp extends SmoothRateLimiter {
      * @param warmupUnit 预热时间单位
      * @param coldFactor 冷却间隔时间 = 冷因子 * 间隔时间
      */
-    SmoothWarmingUp(SleepingStopwatch stopwatch, long warmupPeriod, TimeUnit warmupUnit, double coldFactor) {
+    SmoothWarmingUp(SleepingStopwatch stopwatch, long warmupPeriod, 
+            TimeUnit warmupUnit, double coldFactor) {
         super(stopwatch);
         this.warmupPeriodMicros = warmupUnit.toMicros(warmupPeriod);
         this.coldFactor = coldFactor;
