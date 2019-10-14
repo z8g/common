@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package ratelimit;
 
 import static java.lang.Math.min;
@@ -13,24 +8,36 @@ import java.util.concurrent.TimeUnit;
  */
 public class SmoothWarmingUp extends SmoothRateLimiter {
 
-    private final long warmupPeriodMicros;//预热期(微妙)
+    private final long warmupPeriodMicros;//预热期(微秒)
     private double slope;//坡度
     private double thresholdPermits;//阈值
     private double coldFactor;//冷因子
 
-    SmoothWarmingUp(SleepingStopwatch stopwatch, long warmupPeriod, TimeUnit timeUnit, double coldFactor) {
+    /**
+     * 
+     * @param stopwatch 睡眠表
+     * @param warmupPeriod 预热时间
+     * @param warmupUnit 预热时间单位
+     * @param coldFactor 冷却间隔时间 = 冷因子 * 间隔时间
+     */
+    SmoothWarmingUp(SleepingStopwatch stopwatch, long warmupPeriod, TimeUnit warmupUnit, double coldFactor) {
         super(stopwatch);
-        this.warmupPeriodMicros = timeUnit.toMicros(warmupPeriod);
+        this.warmupPeriodMicros = warmupUnit.toMicros(warmupPeriod);
         this.coldFactor = coldFactor;
     }
 
+    /**
+     * 设置速率
+     * @param qps
+     * @param intervalMicros 间隔时间(微秒)
+     */
     @Override
-    void doSetRate(double permitsPerSecond, double stableIntervalMicros) {
+    void doSetRate(double qps, double intervalMicros) {
         double oldMaxPermits = maxPermits;
-        double coldIntervalMicros = stableIntervalMicros * coldFactor;
-        thresholdPermits = 0.5 * warmupPeriodMicros / stableIntervalMicros;
-        maxPermits = thresholdPermits + 2.0 * warmupPeriodMicros / (stableIntervalMicros + coldIntervalMicros);
-        slope = (coldIntervalMicros - stableIntervalMicros) / (maxPermits - thresholdPermits);
+        double coldIntervalMicros = intervalMicros * coldFactor;//冷却间隔时间=冷因子*间隔时间
+        thresholdPermits = 0.5 * warmupPeriodMicros / intervalMicros;
+        maxPermits = thresholdPermits + 2.0 * warmupPeriodMicros / (intervalMicros + coldIntervalMicros);
+        slope = (coldIntervalMicros - intervalMicros) / (maxPermits - thresholdPermits);
         if (oldMaxPermits == Double.POSITIVE_INFINITY) {
             storedPermits = 0.0;
         } else {

@@ -12,32 +12,25 @@
  */
 package test;
 
+import java.util.concurrent.TimeUnit;
 import ratelimit.RateLimiter;
 
 public class RateLimiterTest {
 
-    
     public static void main(String[] args) throws InterruptedException {
-        System.out.println("1".hashCode());
-        System.out.println("12".hashCode());
-        System.out.println("13".hashCode());
-        System.out.println("141".hashCode());
-        System.out.println("我".hashCode());
-        
-        System.out.println(String.valueOf("我".hashCode()));
-        
+
         int i = 1;
         double qps = 2;
-        RateLimiter rateLimiter = RateLimiter.create(qps);
+        RateLimiter rateLimiter;
+
+        rateLimiter = RateLimiter.newSmoothBursty(qps);
+
         long preTime = System.nanoTime();
 
-        while (i <= 300) {
+        while (i <= 10) {
             rateLimiter.acquire();
-            if (i < 8) {
+            if (i < 4) {
                 Thread.sleep(1000);
-            } 
-            if(i>50){
-                rateLimiter.setRate(5);
             }
             long curTime = System.nanoTime();
             System.out.println(
@@ -46,9 +39,74 @@ public class RateLimiterTest {
             preTime = curTime;
             i++;
         }
+
+        rateLimiter = RateLimiter.newSmoothBursty(qps);
+        System.out.println("\n\n");
+        i = 1;
+        while (i <= 10) {
+            rateLimiter.tryAcquire();
+            if (i < 4) {
+                Thread.sleep(1000);
+            }
+            long curTime = System.nanoTime();
+            System.out.println(
+                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
+                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
+            preTime = curTime;
+            i++;
+        }
+
+        rateLimiter = RateLimiter.newSmoothBursty(qps, 2);
+        System.out.println("\n\n");
+        i = 1;
+        while (i <= 10) {
+            rateLimiter.acquire();
+            if (i < 4) {
+                Thread.sleep(1000);
+            }
+            long curTime = System.nanoTime();
+            System.out.println(
+                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
+                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
+            preTime = curTime;
+            i++;
+        }
+
+        System.out.println("\n\n");
+        rateLimiter = RateLimiter.newSmoothBursty(qps, 2, TimeUnit.SECONDS);
+        i = 1;
+        while (i <= 10) {
+            rateLimiter.acquire();
+            if (i < 4) {
+                Thread.sleep(1000);
+            }
+            long curTime = System.nanoTime();
+            System.out.println(
+                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
+                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
+            preTime = curTime;
+            i++;
+        }
+
+        System.out.println("\n\n");
+        rateLimiter = RateLimiter.newSmoothWarmingUp(qps, 2, TimeUnit.SECONDS, 1);
+        i = 1;
+        while (i <= 10) {
+            rateLimiter.acquire();
+            if (i < 4) {
+                Thread.sleep(1000);
+            }
+            long curTime = System.nanoTime();
+            System.out.println(
+                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
+                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
+            preTime = curTime;
+            i++;
+        }
+
     }
-    
-    public String stringHash(String text){
+
+    public String stringHash(String text) {
         return String.valueOf(text.hashCode());
     }
 }

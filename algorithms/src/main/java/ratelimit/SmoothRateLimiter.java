@@ -59,6 +59,13 @@ public abstract class SmoothRateLimiter extends RateLimiter {
         return nextStartMicros;
     }
 
+    /**
+     * 可提前预定
+     *
+     * @param requiredPermits
+     * @param nowMicros
+     * @return
+     */
     @Override
     long reserveEarliestAvailable(int requiredPermits, long nowMicros) {
         resync(nowMicros);

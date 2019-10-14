@@ -18,8 +18,8 @@ public abstract class RateLimiter {
      * @param qps 每秒内处理的请求数
      * @return 一个"平滑突发"类型的SmoothBursty的实例
      */
-    public static RateLimiter create(double qps) {
-        return create(qps, SleepingStopwatch.create(), 1.0);
+    public static RateLimiter newSmoothBursty(double qps) {
+        return newSmoothBursty(qps, SleepingStopwatch.create(), 1.0);
     }
 
     /**
@@ -29,8 +29,8 @@ public abstract class RateLimiter {
      * @param maxBurstSeconds 在RateLimiter未使用时，最多存储几秒的令牌
      * @return 一个"平滑突发"类型的SmoothBursty的实例
      */
-    public static RateLimiter create(double qps, double maxBurstSeconds) {
-        return create(qps, SleepingStopwatch.create(), maxBurstSeconds);
+    public static RateLimiter newSmoothBursty(double qps, double maxBurstSeconds) {
+        return newSmoothBursty(qps, SleepingStopwatch.create(), maxBurstSeconds);
     }
 
     /**
@@ -40,10 +40,10 @@ public abstract class RateLimiter {
      * @param unit
      * @return
      */
-    public static RateLimiter create(double qps, long warmup, TimeUnit unit) {
+    public static RateLimiter newSmoothBursty(double qps, long warmup, TimeUnit unit) {
         checkArgument(warmup >= 0, String.format("预热指数不能为负: %s", warmup));
         double coldFactor = 2;
-        return create(qps, warmup, unit, coldFactor, SleepingStopwatch.create());
+        return newSmoothWarmingUp(qps, warmup, unit, coldFactor, SleepingStopwatch.create());
     }
 
     /**
@@ -54,11 +54,18 @@ public abstract class RateLimiter {
      * @param maxBurstSeconds 在RateLimiter未使用时，最多存储几秒的令牌
      * @return
      */
-    static RateLimiter create(
+    static RateLimiter newSmoothBursty(
             double qps, SleepingStopwatch stopwatch, double maxBurstSeconds) {
         RateLimiter rateLimiter = new SmoothBursty(stopwatch, maxBurstSeconds);
         rateLimiter.setRate(qps);
         return rateLimiter;
+    }
+
+    
+     public static RateLimiter newSmoothWarmingUp(double permitsPerSecond, long warmupPeriod,
+            TimeUnit unit, double coldFactor) {
+          SleepingStopwatch stopwatch =  SleepingStopwatch.create();
+        return newSmoothWarmingUp(permitsPerSecond, warmupPeriod, unit, coldFactor,stopwatch);
     }
 
     /**
@@ -71,7 +78,7 @@ public abstract class RateLimiter {
      * @param stopwatch
      * @return
      */
-    static RateLimiter create(double permitsPerSecond, long warmupPeriod,
+    static RateLimiter newSmoothWarmingUp(double permitsPerSecond, long warmupPeriod,
             TimeUnit unit, double coldFactor, SleepingStopwatch stopwatch) {
         RateLimiter rateLimiter = new SmoothWarmingUp(stopwatch, warmupPeriod, unit, coldFactor);
         rateLimiter.setRate(permitsPerSecond);
@@ -147,9 +154,9 @@ public abstract class RateLimiter {
      * @return
      */
     public double acquire(int permits) {
-        //预定permits个令牌，并返回等待这些令牌所需的微妙数microsToWait
+        //预定permits个令牌，并返回等待这些令牌所需的微秒数microsToWait
         long microsToWait = reserve(permits);
-        //等待microsToWait微妙
+        //等待microsToWait微秒
         stopwatch.sleepUninterruptibly(microsToWait);
         //返回消耗的时间
         double result = 1.0 * microsToWait / TimeUnit.SECONDS.toMicros(1L);
