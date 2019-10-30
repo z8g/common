@@ -4,24 +4,22 @@
 package net.zhaoxuyang.concurrent.utilities.e1;
 
 import java.math.BigDecimal;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
- * Thread Joining
+ * 线程示例程序 - join
  *
  * @author zhaoxuyang
  */
 public class ThreadDemo3 {
 
     private static final BigDecimal FOUR = BigDecimal.valueOf(4);
-    private static final int roundingMode = BigDecimal.ROUND_HALF_EVEN;
+    private static final int MODE = BigDecimal.ROUND_HALF_EVEN;
     private static BigDecimal result;
 
     public static void main(String[] args) {
         Runnable r = () -> {
-            result = computePi(500000);
+            result = computePi(5000);
         };
 
         Thread t = new Thread(r);
@@ -29,10 +27,9 @@ public class ThreadDemo3 {
         try {
             t.join();
         } catch (InterruptedException ex) {
-            Logger.getLogger(ThreadDemo3.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println(ex);
         }
         System.out.println(result);
-
     }
 
     public static BigDecimal computePi(int digits) {
@@ -50,13 +47,13 @@ public class ThreadDemo3 {
         BigDecimal res, numer, term;
         BigDecimal invX = BigDecimal.valueOf(inverseX);
         BigDecimal invX2 = BigDecimal.valueOf(inverseX * inverseX);
-        numer = BigDecimal.ONE.divide(invX, scale, roundingMode);
+        numer = BigDecimal.ONE.divide(invX, scale, MODE);
         res = numer;
         int i = 1;
         do {
-            numer = numer.divide(invX2, scale, roundingMode);
+            numer = numer.divide(invX2, scale, MODE);
             int denom = 2 * i + 1;
-            term = numer.divide(BigDecimal.valueOf(denom), scale, roundingMode);
+            term = numer.divide(BigDecimal.valueOf(denom), scale, MODE);
 
             if (i % 2 != 0) {
                 res = res.subtract(term);
@@ -66,6 +63,5 @@ public class ThreadDemo3 {
             i++;
         } while (term.compareTo(BigDecimal.ZERO) != 0);
         return res;
-
     }
 }
