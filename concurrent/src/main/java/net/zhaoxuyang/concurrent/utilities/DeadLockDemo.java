@@ -1,12 +1,9 @@
 package net.zhaoxuyang.concurrent.utilities;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 一个死锁的例子
- *
- * @datetime 2019-03-11 03:38
  */
 public class DeadLockDemo {
 
@@ -14,37 +11,29 @@ public class DeadLockDemo {
     private static String B = "B";
 
     public static void main(String[] args) {
-        new DeadLockDemo().deadLock();
+        deadLock();
     }
-
-    public void deadLock() {
-        Thread t1 = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                synchronized (A) {
-                    try {
-                        Thread.sleep(100);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(DeadLockDemo.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                    synchronized (B) {
-                        System.out.println("AB");
-                    }
+    public static void deadLock() {
+        Thread t1 = new Thread(() -> {
+            synchronized (A) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(1);
+                } catch (InterruptedException ex) {
+                    System.err.println(ex);
                 }
-            }
-
-        });
-        Thread t2 = new Thread(new Runnable() {
-            @Override
-            public void run() {
                 synchronized (B) {
-                    synchronized (A) {
-                        System.out.println("BA");
-                    }
+                    System.out.println("AB");
                 }
             }
         });
-        
-        t1.start();t2.start();
+        Thread t2 = new Thread(() -> {
+            synchronized (B) {
+                synchronized (A) {
+                    System.out.println("BA");
+                }
+            }
+        });
+        t1.start();
+        t2.start();
     }
 }
