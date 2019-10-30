@@ -1,7 +1,8 @@
 package net.zhaoxuyang.concurrent.utilities.e1;
 
+import java.util.concurrent.TimeUnit;
 /**
- *
+ * 线程示例程序 - 线程状态
  * @author zhaoxuyang
  */
 public class ThreadDemo1 {
@@ -13,6 +14,10 @@ public class ThreadDemo1 {
             while (true) {
                 System.out.printf("%s is %salive and in %s state%n",
                         t.getName(), t.isAlive() ? "" : "not ", t.getState());
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ex) {
+                }
             }
         };
 
@@ -29,6 +34,7 @@ public class ThreadDemo1 {
         System.out.printf("%s is %salive and in %s state%n",
                 t2.getName(), t2.isAlive() ? "" : "not ", t2.getState());
         
+        System.out.println("========================");
         t1.start();
         t2.start();
     }
