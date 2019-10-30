@@ -25,7 +25,7 @@ public class MyKafkaProducer {
         p.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         try (KafkaProducer<String, String> kafkaProducer = new KafkaProducer<>(p)) {
-            for (int index = 0; index < 10; index++) {
+            for (int index = 20; index < 30; index++) {
                 String msg = "msg" + index;
                 ProducerRecord<String, String> record = new ProducerRecord<>(topic, msg, msg);
                 kafkaProducer.send(record);

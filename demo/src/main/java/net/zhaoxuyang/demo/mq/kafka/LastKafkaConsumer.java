@@ -28,7 +28,7 @@ public class LastKafkaConsumer {
 
     static {
         CONSUMER_PROPERTIES = new Properties();
-        CONSUMER_PROPERTIES.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, true);//不自动提交
+        CONSUMER_PROPERTIES.put(ConsumerConfig.ENABLE_AUTO_COMMIT_CONFIG, false);//不自动提交
         CONSUMER_PROPERTIES.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaProperties.SERVERS);
         CONSUMER_PROPERTIES.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         CONSUMER_PROPERTIES.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -61,15 +61,16 @@ public class LastKafkaConsumer {
                 long recordOffset = record.offset();
 
                 TopicPartition tp = new TopicPartition(recordTopic, recordPartition);
-                OffsetAndMetadata oam = new OffsetAndMetadata(recordOffset);
-
-                curOffsetMap.put(tp, oam);
-                preOffsetMap.putIfAbsent(tp, oam);
+                OffsetAndMetadata preOam = new OffsetAndMetadata(recordOffset);
+                OffsetAndMetadata curOam = new OffsetAndMetadata(recordOffset + 1);
+                
+                preOffsetMap.putIfAbsent(tp, preOam);
+                curOffsetMap.put(tp, curOam);
             }
             System.out.println("curOffsetMap: " + curOffsetMap);
             System.out.println("preOffsetMap: " + preOffsetMap);
 
-            boolean reportResult = Math.random() > 0.8;
+            boolean reportResult = Math.random() > 0.5;
             if (!reportResult) {
                 System.out.println("reportResult==false\n");
 
@@ -78,7 +79,6 @@ public class LastKafkaConsumer {
                 });
             } else {
                 System.out.println("reportResult==true\n");
-
                 kafkaConsumer.commitSync(curOffsetMap);
             }
         }
