@@ -1,7 +1,7 @@
 package net.zhaoxuyang.concurrent.utilities.e1;
 
 /**
- *
+ * 线程示例程序 - 忙循环
  * @author zhaoxuyang
  */
 public class ThreadDemo2 {
