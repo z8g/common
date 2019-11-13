@@ -1,5 +1,4 @@
 import lr
-import numpy
 import unittest
 
 class  Lr_TestCase(unittest.TestCase):
