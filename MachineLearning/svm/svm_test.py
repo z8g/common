@@ -19,7 +19,7 @@ def calcWs(alphas, dataArr, classLabels):
 		w += multiply(alphas[i]*labelMat[i], X[i,:].T)
 	return w
 
-class  Lr_TestCase(unittest.TestCase):
+class  Svm_TestCase(unittest.TestCase):
     def test_sigmoid(self):
 		dataMat, labelMat = svm.loadDataSet('dataset.txt')
 		alphas, b = svm.smoP(dataMat, labelMat, 0.6, 0.001, 40)
