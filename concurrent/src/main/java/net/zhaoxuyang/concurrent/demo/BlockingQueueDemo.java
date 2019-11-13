@@ -17,8 +17,11 @@ public class BlockingQueueDemo{
         Runnable producer = () -> {
             for (char ch = 'A'; ch <= 'Z'; ch++) {
                 try {
-                    bq.put(ch);
-                    System.out.printf("%c profuced by producer.%n", ch);
+                    synchronized(bq){
+                        bq.put(ch);
+                        System.out.printf("%c profuced by producer.%n", ch);
+                    }
+                    
                 } catch (InterruptedException ex) {
                     System.out.println(ex);
                 }
@@ -30,8 +33,11 @@ public class BlockingQueueDemo{
             char ch = '\0';
             do {
                 try {
-                    ch = bq.take();
-                    System.out.println(ch);
+                    synchronized(bq){
+                        ch = bq.take();
+                         System.out.println(ch);
+                    }
+                    
                 } catch (InterruptedException ex) {
                     System.out.println(ex);
                 }
