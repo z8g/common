@@ -93,7 +93,7 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
 		for i in range(m): # [对数据集中的每个向量(内循环):]
 			Ei = getError(dataMatrix, labelMat, alphas, b, i)
 
-			canBeOptimized = ((labelMat[i] * Ei < toler) and (alphas[i] < C)) \
+			canBeOptimized = ((labelMat[i] * Ei < -toler) and (alphas[i] < C)) \
 				or ((labelMat[i] * Ei > toler) and (alphas[i] > 0))  # 能否被优化
 
 			if not canBeOptimized: # [如果该数据向量不可以被优化:]
@@ -160,7 +160,7 @@ def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
 	return alphas, b 
 
 """
-下面的程序中包含1个用于清理代码的数据结构和3个用于对E进行缓存的辅助函数
+下面的程序中包含1个用于清理代码的数据结构和3个用于对E进行缓存的辅助函数，对简单的SMO进行了优化
 """
 class optStruct:
 	def __init__(self, dataMatIn, classLabels, C, toler):
@@ -173,49 +173,161 @@ class optStruct:
 		self.b = 0
 		self.eCache = mat(zeros((self.m, 2))) # 缓存误差
 	
-	def calcEk(oS, k):
-		fXk = oS.b + float(multiply(oS.alphas, oS.labelMat).T 
-						   * (oS.X * oS.X[k,:].T))
-		Ek = fXk - float(oS.labelMat[k])
-		return Ek
-	
-	def selectJ(i, oS, Ei):
-		maxK = -1
-		maxDeltaE = 0
-		Ej = 0
-		oS.eCache[i] = [1, Ei]
-		validEcacheList = nonzero(oS.eCache[:, 0].A)[0]
-		if (len(validEcacheList)) > 1:
-			for k in validEcacheList:
-				if k == i:
-					continue
-				Ek = self.calcEk(oS, k)
-				deltaE = abs(Ei - Ek)
-				
-				# 选择具有最大步长的j
-				if deltaE > maxDeltaE:
-					maxK = k
-					maxDeltaE = deltaE
-					Ej = Ek
-			return maxK, Ej
-		else:
-			j = selectJrand(i, oS.m)
-			Ej = self.calcEk(oS, j)
-			return j, Ej
-	
-	def updateEk(oS, k):
-		Ek = self.calcEk(oS, k)
-		oS.eCache[k] = [1, Ek]
-		
-					
-				
+# 用于选择第二个(内循环)alpha值
+def selectJ(i, oS, Ei):
+	maxK = -1
+	maxDeltaE = 0
+	Ej = 0
+	oS.eCache[i] = [1, Ei]
+	validEcacheList = nonzero(oS.eCache[:, 0].A)[0] # 创建一个非0表
+	if (len(validEcacheList)) > 1:
+		for k in validEcacheList:
+			if k == i:
+				continue
+			Ek = calcEk(oS, k)
+			deltaE = abs(Ei - Ek)
 
+			# 选择具有最大步长的j
+			if deltaE > maxDeltaE:
+				maxK = k
+				maxDeltaE = deltaE
+				Ej = Ek
+		return maxK, Ej
+	else:
+		j = selectJrand(i, oS.m)
+		Ej = calcEk(oS, j)
+		return j, Ej
+
+# 计算E值并返回
+def calcEk(oS, k):
+	fXk = oS.b + float(multiply(oS.alphas, oS.labelMat).T 
+					   * (oS.X * oS.X[k,:].T))
+	Ek = fXk - float(oS.labelMat[k])
+	return Ek
+
+# 计算误差并存入缓存中
+def updateEk(oS, k):
+	Ek = calcEk(oS, k)
+	oS.eCache[k] = [1, Ek]
+
+# 内循环
+def innerL(i, oS):
+	Ei = calcEk(oS, i)
+
+	# 能否被优化
+	canBeOptimized = \
+		((oS.labelMat[i] * Ei < -oS.tol) and (oS.alphas[i] < oS.C)) or \
+		((labelMat[i] * Ei > oS.tol)     and (oS.alphas[i] > 0))
+
+	if not canBeOptimized: # [如果该数据向量不可以被优化:]
+		return 0
+
+	j, Ej = selectJ(i, oS, Ei) # [随机选择另外一个数据向量]
+
+	# 存储旧的alpha列表
+	alphaIold = oS.alphas[i].copy()
+	alphaJold = oS.alphas[j].copy()
+
+	# 保证alpha在0与C之间
+	if oS.labelMat[i] != oS.labelMat[j]:
+		L = max(0,	  oS.alphas[j] - oS.alphas[i])
+		H = min(oS.C, oS.alphas[j] - oS.alphas[i] + oS.C)
+	else:
+		L = max(0,    oS.alphas[j] + oS.alphas[i] - oS.C)
+		H = min(oS.C, oS.alphas[j] + oS.alphas[i])
+	if L == H:
+		print "L==H"
+		return 0
+
+	eta = oS.X[i,:] * oS.X[j,:].T * 2.0 \
+		- oS.X[i,:] * oS.X[i,:].T \
+		- oS.X[j,:] * oS.X[j,:].T
+	if eta >= 0:
+		print "eta>0"
+		return 0
+
+	oS.alphas[j] -= oS.labelMat[j] * (Ei-Ej) / eta
+	oS.alphas[j] = clipAlpha(oS.alphas[j], H, L)
+
+	updateEk(oS, j)
+
+	if abs(oS.alphas[j] - alphaJold) < 0.00001:
+		print "j not moving enough"
+		return 0
+
+	# 对i进行修改，修改量与j相同，但方向相反
+	oS.alphas[i] += oS.labelMat[j] * oS.labelMat[i] * (alphaJold - oS.alphas[j])
+	updateEk(oS, i)
+
+	b1 = oS.b - Ei - oS.labelMat[i] * (oS.alphas[i]-alphaIold) \
+		* oS.X[i,:] \
+		* oS.X[i,:].T \
+	- oS.labelMat[j] * (oS.alphas[i]-alphaJold) \
+		* oS.X[i,:] \
+		* oS.X[j,:].T
+
+	b2 = oS.b - Ej - oS.labelMat[i] * (oS.alphas[i]-alphaIold) \
+		* oS.X[i,:] \
+		* oS.X[j,:].T \
+	- oS.labelMat[j] * (oS.alphas[j]-alphaJold) \
+		* oS.X[j,:] \
+		* oS.X[j,:].T
+
+	if   (0 < oS.alphas[i]) and (oS.C > oS.alphas[j]):
+		oS.b = b1
+	elif (0 < oS.alphas[j]) and (oS.C > oS.alphas[j]):
+		oS.b = b2
+	else:
+		oS.b = (b1 + b2) / 2.0
+	return 1
+
+# 外循环
+def smoP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
+	oS = optStruct(mat(dataMatIn), mat(classLabels).transpose(), C, toler)
+	iter = 0
+	entireSet = True
+	alphaPairsChanged = 0
+
+	while (iter < maxIter) and ((alphaPairsChanged > 0) or entireSet):
+		alphaPairsChanged = 0
+
+		if entireSet:
+			for i in range(oS.m): # 遍历所有的值
+				alphaPairsChanged += innerL(i, oS)
+				print "fullSet, iter: %d i:%d pairs changed %d" %\
+					(iter, i, alphaPairsChanged)
+		else:
+			nonBoundIs = nonzero((oS.alphas.A > 0) * (oS.alphas.A < C))[0]
+			for i in nonBoundIs:
+				alphaPairsChanged += innerL(i, oS)
+				print "non-bound, iter: %d i%d pairs changed %d" %\
+					(iter, i, alphaPairsChanged)
+				iter += 1
+
+		if entireSet:
+			entireSet = False
+		elif (alphaPairsChanged == 0):
+			entireSet = True
+		else:
+			print "iteration number: %d" % iter
+
+	return oS.alphas, oS.b
+		
+		
 if __name__ == '__main__':
 	dataMat, labelMat = loadDataSet('dataset.txt')
 	print dataMat
 	print labelMat
 	
 	alphas, b = smoSimple(dataMat, labelMat, 0.6, 0.001, 40)
+	print b
+	# print alphas[alphas>0.0]	
+	for i in range(100):
+		if alphas[i] > 0.0:
+			print dataMat[i], labelMat[i]
+	print "============================================================="
+	
+	alphas, b = smoP(dataMat, labelMat, 0.6, 0.001, 40)
 	
 	print b
 	# print alphas[alphas>0.0]	
