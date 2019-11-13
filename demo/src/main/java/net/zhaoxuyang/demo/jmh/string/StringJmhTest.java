@@ -50,8 +50,8 @@ import org.openjdk.jmh.runner.options.OptionsBuilder;
  * @author zhaoxuyang
  */
 @State(Scope.Benchmark)
-@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS,batchSize=1000)//
-@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS,batchSize=1000)
+@Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS,batchSize=10)//
+@Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS,batchSize=100)
 public class StringJmhTest {
 
     /**
