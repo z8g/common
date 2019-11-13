@@ -217,7 +217,7 @@ def innerL(i, oS):
 	# 能否被优化
 	canBeOptimized = \
 		((oS.labelMat[i] * Ei < -oS.tol) and (oS.alphas[i] < oS.C)) or \
-		((labelMat[i] * Ei > oS.tol)     and (oS.alphas[i] > 0))
+		((oS.labelMat[i] * Ei > oS.tol)  and (oS.alphas[i] > 0))
 
 	if not canBeOptimized: # [如果该数据向量不可以被优化:]
 		return 0
@@ -312,7 +312,7 @@ def smoP(dataMatIn, classLabels, C, toler, maxIter, kTup=('lin', 0)):
 			print "iteration number: %d" % iter
 
 	return oS.alphas, oS.b
-		
+
 		
 if __name__ == '__main__':
 	dataMat, labelMat = loadDataSet('dataset.txt')
