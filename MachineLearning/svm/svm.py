@@ -1,48 +1,74 @@
 # -*- coding: UTF-8 -*-
-"""
-支持向量机(Support Vector Machines,SVM)
-序列最小化(Sequentail Minimal Optimization,SMO)
-================================================================================
-优点：泛化错误率低，计算开销不大，结果易解释
-缺点：对参数调节和核函数(kernel)的选择敏感，原始分类器不加修改仅使用于处理二类问题
-使用数据类型：数值型和标称型
-================================================================================
-1. 收集数据：可以使用任意方法
-2. 准备数据：需要数值型数据
-3. 分析数据：有助于可视化分割超平面
-4. 训练算法：SVM的大部分时间都源自训练，该过程主要实现两个参数的调优
-5. 测试算法：十分简单的计算过程就可以实现
-6. 使用算法：适用几乎所有分类问题
-"""
-def create_dataset(filepath):
-    dataset = []
-    labels = []
-    file_reader = open(filepath)
-    for line in file_reader.readlines():
-        strs = line.strip().split('\t')
-        dataset.append([float(strs[0]), float(strs[1])])
-        labels.append(float(strs[2]))
-    return dataset, labels
 
 """
-@param i 第一个alpha的下标
-@param m 所有alpha的数目
-"""
-def select_jrand(i, m):
-    j = i
-    while(j == i):
-        j = int(random.uniform(0, m))
-    return j
+SVM有很多种实现，下面是其中最流行的一种实现：
+	序列最小优化(Sequential Minimal Optimization, SMO)算法
+在此之后将介绍如何使用一种称为核函数(Kernel)的方式将SVM扩展到更多数据集上。
 
+基于最大间隔
+
+================================================================================
+								[寻找最大间隔]
+分隔超平面的形式：
+	w^T * x + b
+
+要计算点A到分隔超平面的距离，就必须给出分隔面的法线或垂线的长度：
+	|w^T+b| / ||w||
+
+类别标签选择-1和1而不选择0和1的原因：
+1. 相差一个符号，方便数学上的处理
+2. 不管是哪类，label*(w^T * x + b)都会产生一个很大的正数
+
+接着必须找到具有最小间隔的数据点，一旦找到后，就需要对该间隔最大化：
+arg max{min( label * (w^T * x + b) * (1 / ||w||) )}
+
+固定一个因子而最大化其他因子，约束条件：
+	label*(w^T * x + b) >= 1.0
+
+引入拉格朗日乘子法，将超平面写成数据点的形式，优化目标函数最后可以写成：
+	max(a)[sum(a[]) - 1/2 * sum((label(i) * label(j)<x(i),x(j)>)[])]
+	C>=a>=0,常数C用于控制最大化间隔和保证大部分点的函数间隔小于1.0这个两个目标的权重
+
+一旦求出的所有的a，分隔超平面就可以通过a来表达，SVM中的主要工作就是求这些a
 """
-用于调整大于H或者小于L的alpha值
+
+from numpy import mat
+from numpy import multiply
+from numpy import random
+from numpy import shape
+from numpy import zeros
+from numpy import nonzero
 """
-def clip_alpha(aj, high, low):
-    if aj > high:
-        aj = high
-    if aj < low:
-        aj = low
-    return aj
+SMO算法中的辅助函数
+"""
+def loadDataSet(fileName):
+	dataMat = []
+	labelMat = []
+	fr = open(fileName)
+	for line in fr.readlines():
+		lineArr = line.strip().split('\t')
+		dataMat.append([float(lineArr[0]), float(lineArr[1])])
+		labelMat.append(float(lineArr[2]))
+	return dataMat, labelMat
+
+def selectJrand(i, m):
+	j = i
+	while(j == i):
+		j = int(random.uniform(0, m))
+	return j
+
+def clipAlpha(aj, H, L):
+	if aj > H:
+		aj = H
+	if L > aj:
+		aj = L
+	return aj
+
+# 计算误差
+def getError(dataMatrix, labelMat, alphas, b, index):
+	return b + float(multiply(alphas, labelMat).T *
+					 (dataMatrix * dataMatrix[index, :].T)) - labelMat[index]
+
 
 """
 SMO函数：
@@ -55,21 +81,144 @@ SMO函数：
             如果两个向量都不能被优化，退出内循环
     如果所有向量都没被优化，增加迭代数目，继续下一次循环
 """
-def smo_simple(dataset, labels, C, toler, max_iter):
-    dataset_matrix = numpy.mat(dataset)
-    labels_matrix = numpy.mat(labels).transpose()
-    b = 0
-    m, n = numpy.shape(dataset_matrix)
-    alphas = numpy.mat(zeros((m, 1)))
-    init_iter = 0
-    while init_iter < max_iter:
-        alpha_pairs_changed = 0
-        for i in range(m):
-            fxi = float(numpy.multiply(alphas, labels_matrix).T * 
-                        (dataset_matrix * dataset_matrix[i, :].T)) + b
-            ei = fxi - float(labels_matrix[i])
-            
-    
-    
-    
-    
+def smoSimple(dataMatIn, classLabels, C, toler, maxIter):
+	dataMatrix = mat(dataMatIn)
+	labelMat = mat(classLabels).transpose()
+	b = 0
+	m, n = shape(dataMatrix)
+	alphas = mat(zeros((m, 1))) # [创建一个alpha向量并将其初始化为0向量]
+	iter = 0
+	while (iter < maxIter): # [当迭代次数小于最大迭代次数时(外循环):]
+		alphaPairsChanged = 0
+		for i in range(m): # [对数据集中的每个向量(内循环):]
+			Ei = getError(dataMatrix, labelMat, alphas, b, i)
+
+			canBeOptimized = ((labelMat[i] * Ei < toler) and (alphas[i] < C)) \
+				or ((labelMat[i] * Ei > toler) and (alphas[i] > 0))  # 能否被优化
+
+			if not canBeOptimized: # [如果该数据向量不可以被优化:]
+				break
+
+			j = selectJrand(i, m) # [随机选择另外一个数据向量]
+			Ej = getError(dataMatrix, labelMat, alphas, b, j)
+			
+			# 存储旧的alpha列表
+			alphaIold = alphas[i].copy()
+			alphaJold = alphas[j].copy()
+
+			# 保证alpha在0与C之间
+			if labelMat[i] != labelMat[j]:
+				L = max(0, alphas[j] - alphas[i])
+				H = min(C, alphas[j] - alphas[i] + C)
+			else:
+				L = max(0, alphas[j] + alphas[i] - C)
+				H = min(C, alphas[j] + alphas[i])
+			if L == H:
+				print "L==H"
+				continue
+
+			eta = dataMatrix[i,:] * dataMatrix[j,:].T * 2.0 \
+				- dataMatrix[i,:] * dataMatrix[i,:].T \
+				- dataMatrix[j,:] * dataMatrix[j,:].T
+			if eta >= 0:
+				print "eta>0"
+				continue
+
+			alphas[j] -= labelMat[j] * (Ei-Ej) / eta
+			alphas[j] = clipAlpha(alphas[j], H, L)
+			if abs(alphas[j]-alphaJold) < 0.00001:
+				print "j not moving enough"
+				continue
+
+			# 对i进行修改，修改量与j相同，但方向相反
+			alphas[i] += labelMat[j] * labelMat[i] * (alphaJold - alphas[j])
+
+			b1 = b - Ei - labelMat[i] * (alphas[i]-alphaIold) \
+				* dataMatrix[i,:] \
+				* dataMatrix[i,:].T \
+			- labelMat[j] * (alphas[i]-alphaJold) \
+				* dataMatrix[i,:] \
+				* dataMatrix[j,:].T
+
+			b2 = b - Ej - labelMat[i] * (alphas[i]-alphaIold) \
+				* dataMatrix[i,:] \
+				* dataMatrix[j,:].T \
+			- labelMat[j] * (alphas[j]-alphaJold) \
+				* dataMatrix[j,:] \
+				* dataMatrix[j,:].T
+
+			if   (0 < alphas[i]) and (C > alphas[j]):
+				b = b1
+			elif (0 < alphas[j]) and (C > alphas[j]):
+				b = b2
+			else:
+				b = (b1 + b2) / 2.0
+			alphaPairsChanged += 1
+			print "iter: %d i: %d changed %d" % (iter, i, alphaPairsChanged)
+		if (alphaPairsChanged == 0):
+			iter += 1
+	return alphas, b 
+
+"""
+下面的程序中包含1个用于清理代码的数据结构和3个用于对E进行缓存的辅助函数
+"""
+class optStruct:
+	def __init__(self, dataMatIn, classLabels, C, toler):
+		self.X = dataMatIn
+		self.labelMat = classLabels
+		self.C = C
+		self.tol = toler
+		self.m = shape(dataMatIn)[0]
+		self.alphas = mat(zeros((self.m, 1)))
+		self.b = 0
+		self.eCache = mat(zeros((self.m, 2))) # 缓存误差
+	
+	def calcEk(oS, k):
+		fXk = oS.b + float(multiply(oS.alphas, oS.labelMat).T 
+						   * (oS.X * oS.X[k,:].T))
+		Ek = fXk - float(oS.labelMat[k])
+		return Ek
+	
+	def selectJ(i, oS, Ei):
+		maxK = -1
+		maxDeltaE = 0
+		Ej = 0
+		oS.eCache[i] = [1, Ei]
+		validEcacheList = nonzero(oS.eCache[:, 0].A)[0]
+		if (len(validEcacheList)) > 1:
+			for k in validEcacheList:
+				if k == i:
+					continue
+				Ek = self.calcEk(oS, k)
+				deltaE = abs(Ei - Ek)
+				
+				# 选择具有最大步长的j
+				if deltaE > maxDeltaE:
+					maxK = k
+					maxDeltaE = deltaE
+					Ej = Ek
+			return maxK, Ej
+		else:
+			j = selectJrand(i, oS.m)
+			Ej = self.calcEk(oS, j)
+			return j, Ej
+	
+	def updateEk(oS, k):
+		Ek = self.calcEk(oS, k)
+		oS.eCache[k] = [1, Ek]
+		
+					
+				
+
+if __name__ == '__main__':
+	dataMat, labelMat = loadDataSet('dataset.txt')
+	print dataMat
+	print labelMat
+	
+	alphas, b = smoSimple(dataMat, labelMat, 0.6, 0.001, 40)
+	
+	print b
+	# print alphas[alphas>0.0]	
+	for i in range(99):
+		if alphas[i] > 0.0:
+			print dataMat[i], labelMat[i]
