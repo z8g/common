@@ -9,9 +9,14 @@
  * ————————————————
  * 版权声明：本文为CSDN博主「乘物游心0823」的原创文章，遵循 CC 4.0 BY-SA 版权协议。
  * 原文链接：https://blog.csdn.net/lpq374606827/article/details/95577256
+ * 
+ * https://tech.kujiale.com/ratelimiter-architecture/
  */
 package test;
 
+import java.text.SimpleDateFormat;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import ratelimit.RateLimiter;
 
@@ -19,91 +24,46 @@ public class RateLimiterTest {
 
     public static void main(String[] args) throws InterruptedException {
 
-        int i = 1;
-        double qps = 2;
-        RateLimiter rateLimiter;
-
-        rateLimiter = RateLimiter.newSmoothBursty(qps);
-
-        long preTime = System.nanoTime();
-
-        while (i <= 10) {
-            rateLimiter.acquire();
-            if (i < 4) {
-                Thread.sleep(1000);
-            }
-            long curTime = System.nanoTime();
-            System.out.println(
-                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
-                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
-            preTime = curTime;
-            i++;
+        //        //RateLimiter rateLimiter = RateLimiter.newSmoothWarmingUp(10,1,TimeUnit.MILLISECONDS,2);
+            RateLimiter rateLimiter = RateLimiter.newSmoothBursty(10);
+        
+        final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+        for(int i=0;i<5;i++) {
+                try {
+                    rateLimiter.acquire();
+                    long curTime = System.currentTimeMillis();
+                    System.out.println(sdf.format(curTime));
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
         }
-
-        rateLimiter = RateLimiter.newSmoothBursty(qps);
-        System.out.println("\n\n");
-        i = 1;
-        while (i <= 10) {
-            rateLimiter.tryAcquire();
-            if (i < 4) {
-                Thread.sleep(1000);
+        
+        Thread.sleep(1000);
+        
+        for(int i=0;i<5;i++) {
+            try {
+                rateLimiter.acquire();
+                long curTime = System.currentTimeMillis();
+                System.out.println(sdf.format(curTime));
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-            long curTime = System.nanoTime();
-            System.out.println(
-                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
-                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
-            preTime = curTime;
-            i++;
         }
-
-        rateLimiter = RateLimiter.newSmoothBursty(qps, 2);
-        System.out.println("\n\n");
-        i = 1;
-        while (i <= 10) {
-            rateLimiter.acquire();
-            if (i < 4) {
-                Thread.sleep(1000);
-            }
-            long curTime = System.nanoTime();
-            System.out.println(
-                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
-                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
-            preTime = curTime;
-            i++;
-        }
-
-        System.out.println("\n\n");
-        rateLimiter = RateLimiter.newSmoothBursty(qps, 2, TimeUnit.SECONDS);
-        i = 1;
-        while (i <= 10) {
-            rateLimiter.acquire();
-            if (i < 4) {
-                Thread.sleep(1000);
-            }
-            long curTime = System.nanoTime();
-            System.out.println(
-                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
-                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
-            preTime = curTime;
-            i++;
-        }
-
-        System.out.println("\n\n");
-        rateLimiter = RateLimiter.newSmoothWarmingUp(qps, 2, TimeUnit.SECONDS, 1);
-        i = 1;
-        while (i <= 10) {
-            rateLimiter.acquire();
-            if (i < 4) {
-                Thread.sleep(1000);
-            }
-            long curTime = System.nanoTime();
-            System.out.println(
-                    String.format("curTime:%s\tElapsed:%s\tdata:%s\t%s",
-                            curTime, (curTime - preTime) / 1000000, i, rateLimiter));
-            preTime = curTime;
-            i++;
-        }
-
+//        
+//        ExecutorService fixedThreadPool = Executors.newFixedThreadPool(10);
+//        for(int i=0;i<10;i++) {
+//            fixedThreadPool.submit(() -> {
+//                try {
+//                    rateLimiter.acquire();
+//                    long curTime = System.currentTimeMillis();
+//                    System.out.println(sdf.format(curTime));
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                }
+//            });
+//        }
+//        fixedThreadPool.shutdown();
+//        fixedThreadPool.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
     }
 
     public String stringHash(String text) {

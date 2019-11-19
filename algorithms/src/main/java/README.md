@@ -81,6 +81,8 @@
 - <a href="#10-数论算法">10 数论算法</a>
 	- <a href="#101-stein求最大公约数">10.1 Stein求最大公约数</a>
 	- <a href="#102-矩阵求斐波那切数列">10.2 矩阵求斐波那切数列</a>
+
+
 ## 1 设计接口
 ### 1.1 容器接口Container
 ```java
@@ -121,8 +123,8 @@ public interface Stack<T>extends Container {
     T peek();
 }
 ```
- 
- 
+
+
 ### 1.4 队列接口Queue
 ```java
 package ds;
@@ -133,7 +135,7 @@ public interface Queue<T> extends Container {
     T dequeue();
 }
 ```
- 
+
 ### 1.5 Union-Find算法接口UF
 ```java
 package ds;
@@ -150,10 +152,10 @@ public interface UF {
     }
 }
 ```
- 
+
 ## 2 实现接口
 > 为数组和链表定义了公共的结点和迭代器实现。
- 
+
 ### 2.1 结点类Node
 ```java
 package ds.util;
@@ -163,7 +165,7 @@ public class Node<T> {
    public Node<T> next;
 }
 ```
- 
+
 ### 2.2 数组迭代器ArrayIterator
 ```java
 package ds.util;
@@ -266,9 +268,9 @@ public class ArrayBag<T> implements Iterable<T>,Bag<T> {
 }
 ```
 
-
 #### 2.4.2 链式Bag的实现
-```
+
+```java
 package ds.impl;
 import ds.util.Node;
 import ds.Bag;
@@ -310,6 +312,7 @@ public class LinkedBag<T> implements Iterable<T>, Bag<T> {
 ```
 
 ### 2.5 栈(Stack)的实现
+
 > 栈(Stack)是一种先进后出的数据类型。
 
 #### 2.5.1 能动态调整数组大小的Stack
@@ -372,7 +375,7 @@ public class ArrayStack<T> implements Iterable<T>,Stack<T> {
 ```
 
 #### 2.5.2 链式Stack的实现
-```
+```java
 package ds.impl;
 import ds.util.Node;
 import ds.Stack;
@@ -444,6 +447,7 @@ public class LinkedStack<T> implements Iterable<T>,Stack<T> {
 > 队列(Queue)是一种先进先出的数据类型。
 
 #### 2.6.1 能动态调整数组大小的Queue
+
 ```java
 package ds.impl;
 import ds.Queue;
@@ -514,7 +518,7 @@ public class ArrayQueue<T> implements Iterable<T>,Queue<T> {
 ```
 
 #### 2.6.2 链式Queue的实现
-```
+```java
 package ds.impl;
 import ds.util.Node;
 import ds.Queue;
@@ -638,7 +642,7 @@ public class DefaultUF implements UF {
     }
 }
 ```
- 
+
 #### 2.7.2 QuickFindUF
 ```java
 package ds.impl;
@@ -854,7 +858,7 @@ public class StackTest {
     }
 }
 ```
- 
+
 #### 2.8.2 测试Union-Find
 ```java
 package test;
@@ -1192,8 +1196,8 @@ public class Sort {
 
 
 #### 3.6.2 排序前先洗牌
- 
-```
+
+```java
    /**
      * 快速排序:在排序前先洗牌（可以参考随机化算法-舍伍德算法）
      * <pre>
@@ -1217,9 +1221,9 @@ public class Sort {
 //        quickSort3way(a, 0, a.length - 1);
     }
 ```
- 
+
 > 以下是该洗牌算法的实现
-```
+```java
 package util;
 import java.util.Arrays;
 /**
@@ -1252,8 +1256,8 @@ public class Shuffle {
 
 
 ```
- 
- 
+
+
 #### 3.6.3 快速排序的改进方法-小数据量转成插入排序
 ```java
     /**
@@ -1293,7 +1297,7 @@ public class Shuffle {
         quickSort(a, gt + 1, high);
     }
 ```
- 
+
 #### 3.6.4 快速排序的改进方法-三向切分
 ```java
     /**
@@ -1330,7 +1334,7 @@ public class Shuffle {
         quickSort(a, gt + 1, high);
     }
 ```
- 
+
 ### 3.7 堆排序
 > 时间复杂度O(nlog(n))，辅助空间O(nlog(n))，不稳定
 
@@ -1359,9 +1363,9 @@ public class Shuffle {
         }
     }
 ```
+
  
- 
- 
+
 ### 3.8 最终的排序工具
 ```java
 package util;
@@ -1948,7 +1952,7 @@ public class MaxPriorityQueue<T> implements Iterable<T> {
 
 
 ```
- 
+
 ### 4.3 二叉查找树(BST)
 ```java
 package ds.impl;
@@ -2451,9 +2455,9 @@ public class RedBlackBST<K extends Comparable<K>, V> {
 
 
 ```
- 
+
 ### 4.5 B-树(BTree)
-```
+```java
 package ds.impl;
 import ds.Container;
 
@@ -2642,8 +2646,8 @@ public class BTree<K extends Comparable<K>, V> implements Container {
 
 ```
 
-
 ## 5 图
+
 ### 5.1 无向图(Graph)
 ```java
 package ds.impl;
@@ -2728,7 +2732,7 @@ public class Graph {
 ```
 
 ### 5.2 有向图(Digraph)
-```
+```java
 package ds.impl;
 
 public class Digraph {
@@ -2827,9 +2831,9 @@ public class Digraph {
 
 
 ```
+
  
- 
- 
+
 ## 6 贪心
 ### 6.1 Dijkstra算法-单元最短路径
 #### 6.1.1 问题描述
@@ -3143,9 +3147,9 @@ public class ProcessingSquence {
 ```
 
 ## 8 搜索法
- 
+
 ### 8.1 图的着色问题
-```
+```java
 package net.zhaoxuyang.common.algorithm.search;
 /**
  * 图的m着色问题
@@ -3213,9 +3217,9 @@ public class MColoring {
 
 
 ```
- 
 
 ### 8.2 深度优先搜索
+
 ```c++
 bool Visited[n + 1];
 for(int i = 1; i <= n; i++){
@@ -3263,7 +3267,7 @@ void Dfs(){
 
 算法描述：
 > (1)递归形式
-```
+```c++
 // t为扩展节点在树中所处的层次
 void Backtrack(int t){
     if(t > n){
@@ -3280,7 +3284,7 @@ void Backtrack(int t){
 }
 ```
 > (2)非递归形式
-```
+```c++
 void NBacktrack(){
     int t = 1;
     while(t > 0){
@@ -3308,7 +3312,7 @@ void NBacktrack(){
 - 装载问题
 - 最大团问题
 算法描述：
-```
+```c++
 //x用来存放当前解，constraint()为约束函数，bound()为限界函数
 void Backtrack(int t){
     if(t > n){
@@ -3329,6 +3333,7 @@ void Backtrack(int t){
 }
 ```
 #### 8.3.3 排列树
+
 > 当所给的问题是从n个元素的排列中找出满足某种性质的一个排列时，相应的解空间称为排列树。
 - n皇后问题
 - 旅行商问题
@@ -3336,7 +3341,7 @@ void Backtrack(int t){
 - 圆排列问题
 - 电路板排序问题
 算法描述：
-```
+```c++
 void Backtrack(int t){
     if(t > n){
         output(x);
@@ -3353,13 +3358,13 @@ void Backtrack(int t){
 ```
 #### 8.3.4 满m叉树(组合树)
 > 当所给问题的n个元素中每一个元素均有m种选择，要求确定其中的一种选择，
-使得对这n个元素的选择结果组成的向量满足某种性质，即寻找满足某种特性的n个元素取值的一个组合。
-这类问题的解空间称为满m叉树。
+> 使得对这n个元素的选择结果组成的向量满足某种性质，即寻找满足某种特性的n个元素取值的一个组合。
+> 这类问题的解空间称为满m叉树。
 - n皇后问题
 - 图的m着色问题
 - 最小机器设计问题
 算法描述：
-```
+```c++
 void Backtrack(int t){
     if(t > n) {
         output(x);
@@ -3376,8 +3381,9 @@ void Backtrack(int t){
 }
 ```
 ### 8.4 广度优先搜索
+
 算法描述：
-```
+```c++
 bool Visited[n + 1];
 for(int i = 1; i <= n; i++){
     Visited[i] = 0;
@@ -3412,16 +3418,17 @@ BFS(){
  
 ```
 ### 8.5 分支限界法
+
 > 分支限界发先将根结点加入活结点表，接着从活结点表中取出根结点，使其成为当前扩展结点，
-一次性生成所有孩子结点，判断孩子结点是舍弃还是保留，舍弃那些导致可行解或者导致非最优解的孩子结点，
-其余的被保留在活结点表中。
-再从活结点表中取出一个活结点，重复上述过程。
-解题步骤：
+> 一次性生成所有孩子结点，判断孩子结点是舍弃还是保留，舍弃那些导致可行解或者导致非最优解的孩子结点，
+> 其余的被保留在活结点表中。
+> 再从活结点表中取出一个活结点，重复上述过程。
+> 解题步骤：
 1. 定义问题的解空间
 2. 确定问题的解空间组织结构(树或图)
 3. 搜索解空间。搜索要定义判断标准(约束函数或限界函数)，如果选用优先队列，需确定优先级。
- 
- 
+
+
 ## 9 随机化算法
 > 随机化算法分类：
 - 数值随机化算法：在原理上可能就不存在精确解，或者无法在可行时间内求得，因此用该算法得到相当满意的解。
@@ -3431,7 +3438,7 @@ BFS(){
 
 
 ### 9.1 数值随机化算法
- 
+
 ```java
 package net.zhaoxuyang.common.algorithm.random;
 /**
@@ -3494,7 +3501,7 @@ public class Numerical {
 
 
 ```
- 
+
 ### 9.2 蒙特卡罗算法
 ```java
 package net.zhaoxuyang.common.algorithm.random;
@@ -3590,7 +3597,7 @@ public class MonteCarlo {
     }
 }
 ```
- 
+
 ### 9.3 拉斯维加斯算法
 ```java
 package net.zhaoxuyang.common.algorithm.random;
@@ -3651,9 +3658,10 @@ public class LasVegas {
     }
 }
 ```
- 
+
 ### 9.4 舍伍德算法
-```
+
+```java
 package net.zhaoxuyang.common.algorithm.random;
 import java.util.Arrays;
 import net.zhaoxuyang.common.algorithm.other.QuickSort;
@@ -3684,8 +3692,9 @@ public class Sherwood {
 ```
 
 ## 10 数论算法
- 
+
 ### 10.1 Stein求最大公约数
+
 ```java
 package net.zhaoxuyang.common.algorithm.math;
 /**
@@ -3717,7 +3726,7 @@ public class Stein {
 
 
 ```
- 
+
 ### 10.2 矩阵求斐波那切数列
 ```java
 package net.zhaoxuyang.common.algorithm.other;
@@ -3886,7 +3895,4 @@ public class Fibonacci {
 
 
 ```
- 
- 
- 
  
