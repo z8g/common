@@ -4,7 +4,6 @@ package net.zhaoxuyang.demo.jmh.string;
  *
  * @author zhaoxuyang
  */
-
 import org.openjdk.jmh.annotations.*;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
@@ -22,60 +21,65 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 public class StringConcatTest {
 
+    public static void main(String[] args) throws RunnerException {
+        Options opt = new OptionsBuilder()
+                .include(StringConcatTest.class.getSimpleName())
+                .forks(1)
+                .build();
+        new Runner(opt).run();
+    }
 
-  String a = "select u.id,u.name from user  u";
-  String b="  where u.id=? "   ;
-  String e = " and 1=1";
-  
-  
-  
-  @Benchmark
-  public String concat(){
-    String c = a+b+e;
-    return c ;
+    String a = "select name";
+    String b = "from city";
+    String c = "where id=? ";
 
-  }
+    @Benchmark
+    public String concat() {
+        String result = a + b + c;
+        return result;
 
-  @Benchmark
-  public String constants(){
-    String c = "select u.id,u.name from user  u  where u.id=?  and 1=1";
-    return c ;
+    }
 
-  }
+    @Benchmark
+    public String constants() {
+        String result = "select name from city where id=?";
+        return result;
+    }
 
-  @Benchmark
-  public String concatbyOptimizeBuilder(){
-      StringBuilder sb =new StringBuilder();
-    String c = sb.append(a).append(b).append(e).toString();
-    return c;
-  }
+    @Benchmark
+    public String concatbyOptimizeBuilder() {
+        StringBuilder sb = new StringBuilder();
+        String result = sb.append(a).append(b).append(c).toString();
+        return result;
+    }
 
+    @Benchmark
+    public String concatbyOptimizeBuffer() {
+        StringBuffer sb = new StringBuffer();
+        String result = sb.append(a).append(b).append(c).toString();
+        return result;
+    }
 
-  @Benchmark
-  public String concatbyBuilder(){
-    //不会优化
-    StringBuilder sb = new StringBuilder();
-    sb.append(a);
-    sb.append(b);
-    sb.append(e);
-    return sb.toString();
-  }
+    @Benchmark
+    public String concatbyBuilder() {
+        // JIT不会优化
+        StringBuilder sb = new StringBuilder();
+        sb.append(a);
+        sb.append(b);
+        sb.append(c);
+        String result = sb.toString();
+        return result;
+    }
 
-  @Benchmark
-  public String concatbyBuffer(){
-    StringBuffer sb = new StringBuffer();
-    sb.append(a);
-    sb.append(b);
-    sb.append(e);
-    return sb.toString();
-  }
+    @Benchmark
+    public String concatbyBuffer() {
+        // JIT不会优化
+        StringBuffer sb = new StringBuffer();
+        sb.append(a);
+        sb.append(b);
+        sb.append(c);
+        String result = sb.toString();
+        return result;
+    }
 
-
-  public static void main(String[] args) throws RunnerException {
-    Options opt = new OptionsBuilder()
-      .include(StringConcatTest.class.getSimpleName())
-      .forks(1)
-      .build();
-    new Runner(opt).run();
-  }
 }
