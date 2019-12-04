@@ -3,14 +3,14 @@ package net.zhaoxuyang.demo.asm;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import jdk.internal.org.objectweb.asm.ClassWriter;
-import jdk.internal.org.objectweb.asm.util.TraceClassVisitor;
+import org.objectweb.asm.ClassWriter;
 import static org.objectweb.asm.Opcodes.ACC_ABSTRACT;
 import static org.objectweb.asm.Opcodes.ACC_FINAL;
 import static org.objectweb.asm.Opcodes.ACC_INTERFACE;
 import static org.objectweb.asm.Opcodes.ACC_PUBLIC;
 import static org.objectweb.asm.Opcodes.ACC_STATIC;
 import static org.objectweb.asm.Opcodes.V1_8;
+import org.objectweb.asm.util.TraceClassVisitor;
 
 /**
  * TraceClassVisitor用来查看生成的字节码对应的类是否是想要的类.
