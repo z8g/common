@@ -1,7 +1,6 @@
 package util;
 
 import java.util.Arrays;
-import util.Shuffle;
 
 /**
  * 排序
@@ -25,7 +24,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void heapSort(T[] a) {
+    public static <T extends Comparable<T>> void heapSort(T[] a) {
         int n = a.length;
         for (int k = n / 2; k >= 1; k--) {
             sink(a, k, n);
@@ -36,7 +35,7 @@ public class Sort {
         }
     }
 
-    private static <T extends Comparable> void sink(T[] pq, int k, int n) {
+    private static <T extends Comparable<T>> void sink(T[] pq, int k, int n) {
         while (2 * k <= n) {
             int j = 2 * k;
             if (j < n && less(pq[j - 1], pq[j])) {
@@ -66,7 +65,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void quickSort(T[] a) {
+    public static <T extends Comparable<T>> void quickSort(T[] a) {
         Shuffle.shuffle(a);
         quickSort(a, 0, a.length - 1);
 //        quickSortInsert(a, 0, a.length - 1);
@@ -85,7 +84,7 @@ public class Sort {
      * @param low
      * @param high
      */
-    public static <T extends Comparable>
+    public static <T extends Comparable<T>>
             void quickSortInsert(T[] a, int low, int high) {
 
         int m = 65535;
@@ -122,7 +121,7 @@ public class Sort {
      * @param low
      * @param high
      */
-    public static <T extends Comparable>
+    public static <T extends Comparable<T>>
             void quickSort3way(T[] a, int low, int high) {
 
         if (high <= low) {
@@ -154,7 +153,7 @@ public class Sort {
      * @param low
      * @param high
      */
-    public static <T extends Comparable>
+    public static <T extends Comparable<T>>
             void quickSort(T[] a, int low, int high) {
         int p;
         if (low < high) {
@@ -173,7 +172,7 @@ public class Sort {
      * @param high
      * @return
      */
-    private static <T extends Comparable>
+    private static <T extends Comparable<T>>
             int partition(T[] a, int low, int high) {
         int i = low;
         int j = high;
@@ -206,7 +205,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void mergeSort2(T[] a) {
+    public static <T extends Comparable<T>> void mergeSort2(T[] a) {
         int N = a.length;
         mergeAux = new Comparable[a.length];
         for (int i = 1; i < N; i = i + i) {
@@ -222,7 +221,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void mergeSort(T[] a) {
+    public static <T extends Comparable<T>> void mergeSort(T[] a) {
         mergeAux = new Comparable[a.length];
         mergeSort(a, 0, a.length - 1);
     }
@@ -235,7 +234,7 @@ public class Sort {
      * @param low
      * @param high
      */
-    public static <T extends Comparable>
+    public static <T extends Comparable<T>>
             void mergeSort(T[] a, int low, int high) {
         if (high <= low) {
             return;
@@ -263,7 +262,7 @@ public class Sort {
      * @param middle
      * @param high
      */
-    private static <T extends Comparable>
+    private static <T extends Comparable<T>>
             void merge(T[] a, int low, int middle, int high) {
         int i = low;
         int j = middle + 1;
@@ -310,7 +309,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void insertSort(T[] a) {
+    public static <T extends Comparable<T>> void insertSort(T[] a) {
         insertSort(a, 0, a.length);
     }
 
@@ -322,7 +321,7 @@ public class Sort {
      * @param low
      * @param high
      */
-    public static <T extends Comparable> void insertSort(T[] a, int low, int high) {
+    public static <T extends Comparable<T>> void insertSort(T[] a, int low, int high) {
         for (int i = low + 1; i < high; i++) {
             for (int j = i; j > 0 && less(a[j], a[j - 1]); j--) {
                 swap(a, j, j - 1);
@@ -336,7 +335,7 @@ public class Sort {
      * @param <T>
      * @param a
      */
-    public static <T extends Comparable> void selectSort(T[] a) {
+    public static <T extends Comparable<T>> void selectSort(T[] a) {
         int len = a.length;
         for (int i = 0; i < len; i++) {
             int min = i;
@@ -357,7 +356,7 @@ public class Sort {
      * @param i
      * @param j
      */
-    private static <T extends Comparable> void swap(T[] array, int i, int j) {
+    private static <T extends Comparable<T>> void swap(T[] array, int i, int j) {
         T tmp = array[i];
         array[i] = array[j];
         array[j] = tmp;
@@ -371,7 +370,7 @@ public class Sort {
      * @param b
      * @return
      */
-    private static <T extends Comparable> boolean less(T a, T b) {
+    private static <T extends Comparable<T>> boolean less(T a, T b) {
         return a.compareTo(b) < 0;
     }
 
@@ -383,7 +382,7 @@ public class Sort {
      * @param b
      * @return
      */
-    private static <T extends Comparable> boolean eq(T a, T b) {
+    private static <T extends Comparable<T>> boolean eq(T a, T b) {
         return a.compareTo(b) == 0;
     }
 
@@ -394,7 +393,7 @@ public class Sort {
      * @param array
      * @return
      */
-    public static <T extends Comparable> boolean isSorted(T[] array) {
+    public static <T extends Comparable<T>> boolean isSorted(T[] array) {
         for (int i = 1; i < array.length; i++) {
             if (less(array[i], array[i - 1])) {
                 return false;
@@ -409,7 +408,7 @@ public class Sort {
      * @param <T>
      * @param array
      */
-    public static <T extends Comparable> void print(T[] array) {
+    public static <T extends Comparable<T>> void print(T[] array) {
         for (T t : array) {
             System.out.print(t + " ");
         }
